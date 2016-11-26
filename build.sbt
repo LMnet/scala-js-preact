@@ -28,14 +28,18 @@ lazy val core = project
     jsDependencies += "org.webjars.npm" % "preact" % "7.0.3" / "dist/preact.min.js"
   )
 
-lazy val todomvcExample = project.in(file("./examples/todomvc"))
+lazy val basicExample = project.in(file("./examples/basic"))
   .enablePlugins(ScalaJSPlugin)
   .settings(commonSettings: _*)
   .dependsOn(core)
 
-lazy val basicExample = project.in(file("./examples/basic"))
+lazy val todomvcExample = project.in(file("./examples/todomvc"))
   .enablePlugins(ScalaJSPlugin)
   .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies += "com.github.fomkin" %%% "pushka-json" % "0.8.0",
+    addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+  )
   .dependsOn(core)
 
 lazy val examples = project

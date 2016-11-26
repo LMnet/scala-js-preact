@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>scala-js-preact • TodoMVC</title>
+		<link rel="stylesheet" href="./src/main/resources/base.css">
+		<link rel="stylesheet" href="./src/main/resources/index.css">
+	</head>
+	<body>
+
+		<div id="app"></div>
+
+		<footer class="info">
+			<p>Double-click to edit a todo</p>
+			<p>Created by <a href="https://github.com/lmnet">LMnet</a></p>
+			<p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+		</footer>
+
+		<script src="./src/main/resources/base.js"></script>
+
+		<script type="text/javascript" src="./target/scala-2.12/todomvcexample-jsdeps.js"></script>
+		<script type="text/javascript" src="./target/scala-2.12/todomvcexample-fastopt.js"></script>
+		<script type="text/javascript">
+            todomvc.App().main();
+		</script>
+	</body>
+</html>

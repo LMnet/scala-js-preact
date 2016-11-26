@@ -1,5 +1,7 @@
 package preact
 
+import preact.Preact.VNode
+
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSName, ScalaJSDefined}
 
@@ -16,7 +18,7 @@ private[preact] abstract class Component[Props, State] extends Preact.raw.Compon
 
   @JSName("sSetState")
   @inline
-  protected final def setState(state: State) = {
+  protected final def setState(state: State): Unit = {
     jsSetState(state.asInstanceOf[js.Dynamic])
   }
 
@@ -53,4 +55,6 @@ private[preact] abstract class Component[Props, State] extends Preact.raw.Compon
   protected def componentWillUpdate(): Unit = {}
 
   protected def componentDidUpdate(): Unit = {}
+
+  def render(): VNode
 }

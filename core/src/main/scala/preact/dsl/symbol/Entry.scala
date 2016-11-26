@@ -9,6 +9,8 @@ object Entry {
   case class Attribute(value: (String, js.Any)) extends Entry
   case class Child(value: Preact.Child) extends Entry
   case class Children(value: Seq[Preact.Child]) extends Entry
+  case object EmptyAttribute extends Entry
+  case object EmptyChild extends Entry
 }
 
 trait EntryImplicits {
@@ -18,6 +20,10 @@ trait EntryImplicits {
   }
 
   implicit def stringTupleToEntry(tuple: (String, String)): Entry = {
+    Entry.Attribute((tuple._1, tuple._2))
+  }
+
+  implicit def conversableTupleToEntry[T](tuple: (String, T))(implicit conversion: T => js.Any): Entry = {
     Entry.Attribute((tuple._1, tuple._2))
   }
 
@@ -43,6 +49,10 @@ trait EntryImplicits {
 
   implicit def vnodeToEntry(vnode: Preact.VNode): Entry = {
     Entry.Child(vnode)
+  }
+
+  implicit def vnodesToEntry(vnodes: Seq[Preact.VNode]): Entry = {
+    Entry.Children(vnodes.asInstanceOf[Seq[Preact.Child]])
   }
 
   implicit def stringToEntry(x: String): Entry = {

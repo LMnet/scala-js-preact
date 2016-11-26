@@ -26,6 +26,12 @@ package object symbol extends EntryImplicits {
 
             case Entry.Children(entryChildren) =>
               (acc._1, acc._2 ++ entryChildren)
+
+            case Entry.EmptyAttribute =>
+              acc
+
+            case Entry.EmptyChild =>
+              acc
           }
         }
       Preact.raw.h(self.name, attributes, children: _*)
