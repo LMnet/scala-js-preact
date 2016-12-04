@@ -34,7 +34,8 @@ object Preact {
   }
 
   def render(node: VNode, parent: dom.Element): dom.Element = raw.render(node, parent)
-  def render(node: VNode, parent: dom.Element, merge: Boolean): dom.Element = raw.render(node, parent, merge)
+  def render(node: VNode, parent: dom.Element, mergeWith: dom.Element): dom.Element =
+    raw.render(node, parent, mergeWith)
 
   def rerender(): Unit = raw.rerender()
 }

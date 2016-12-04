@@ -39,4 +39,6 @@ private[preact] trait PropsComponentFactory extends ComponentFactory {
   def apply(props: Props, children: Preact.Child*)(implicit ct: js.ConstructorTag[Component]): VNode = {
     Preact.raw.h(ct.constructor, props.asInstanceOf[Preact.raw.Attributes], children: _*)
   }
+
+  //TODO: add apply with props params through macro
 }

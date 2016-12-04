@@ -8,7 +8,7 @@ sealed trait Entry
 object Entry {
   case class Attribute(value: (String, js.Any)) extends Entry
   case class Child(value: Preact.Child) extends Entry
-  case class Children(value: Seq[Preact.Child]) extends Entry
+  case class Children(value: Iterable[Preact.Child]) extends Entry
   case object EmptyAttribute extends Entry
   case object EmptyChild extends Entry
 }
@@ -43,7 +43,7 @@ trait EntryImplicits {
     Entry.Child(child)
   }
 
-  implicit def childrenToEntry(children: Seq[Preact.Child]): Entry = {
+  implicit def childrenToEntry(children: Iterable[Preact.Child]): Entry = {
     Entry.Children(children)
   }
 
@@ -51,8 +51,8 @@ trait EntryImplicits {
     Entry.Child(vnode)
   }
 
-  implicit def vnodesToEntry(vnodes: Seq[Preact.VNode]): Entry = {
-    Entry.Children(vnodes.asInstanceOf[Seq[Preact.Child]])
+  implicit def vnodesToEntry(vnodes: Iterable[Preact.VNode]): Entry = {
+    Entry.Children(vnodes.asInstanceOf[Iterable[Preact.Child]])
   }
 
   implicit def stringToEntry(x: String): Entry = {

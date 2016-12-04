@@ -9,11 +9,13 @@ object FunctionFactory {
   import Preact.FunctionComponent._
 
   def withProps[Props <: Product](f: Props => VNode): WithProps[Props] = {
-    (props: Props) => {
-      val jsWrapper = (jsProps: js.Dynamic) => {
-        f(jsProps.asInstanceOf[Props])
+    new WithProps[Props] {
+      override def apply(props: Props): VNode = {
+        val jsWrapper = (jsProps: js.Dynamic) => {
+          f(jsProps.asInstanceOf[Props])
+        }
+        Preact.raw.h(jsWrapper(_), props.asInstanceOf[Preact.raw.Attributes], null)
       }
-      Preact.raw.h(jsWrapper(_), props.asInstanceOf[Preact.raw.Attributes], null)
     }
   }
 

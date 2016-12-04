@@ -70,7 +70,7 @@ object TodoItem extends Preact.Factory.WithProps {
     }
 
     override def componentDidUpdate(): Unit = {
-      base.querySelector(".edit") match {
+      base.get.querySelector(".edit") match {
         case x: HTMLInputElement => x.focus()
         case _ =>
       }
