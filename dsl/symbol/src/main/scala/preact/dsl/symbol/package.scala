@@ -34,7 +34,8 @@ package object symbol extends EntryImplicits {
               acc
           }
         }
-      Preact.raw.h(self.name, attributes, children: _*)
+      val vnodeAttributes = if (attributes.isEmpty) null else attributes
+      Preact.raw.h(self.name, vnodeAttributes, children: _*)
     }
   }
 

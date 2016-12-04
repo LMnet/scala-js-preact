@@ -1,5 +1,6 @@
 package preact
 
+import org.scalajs.dom
 import preact.Preact.VNode
 
 import scala.scalajs.js
@@ -12,6 +13,9 @@ private[preact] abstract class Component[Props, State] extends Preact.raw.Compon
   @inline
   protected final def props: Props = jsProps.asInstanceOf[Props]
 
+  /**
+    * Could be undefined at runtime!
+    */
   @JSName("sState")
   @inline
   protected final def state: State = jsState.asInstanceOf[State]
@@ -38,6 +42,12 @@ private[preact] abstract class Component[Props, State] extends Preact.raw.Compon
   @inline
   protected final def key: Option[String] = {
     jsProps.key.asInstanceOf[js.UndefOr[String]].toOption
+  }
+
+  @JSName("sBase")
+  @inline
+  protected final def base: Option[dom.Element] = {
+    jsBase.asInstanceOf[js.UndefOr[dom.Element]].toOption
   }
 
   protected def componentWillMount(): Unit = {}
