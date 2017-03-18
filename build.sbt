@@ -6,7 +6,33 @@ name := "scala-js-preact"
 
 scalaVersion := scalaVer
 
-val commonSettings = Seq(
+val publishSettings = Seq(
+  publishMavenStyle := true,
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
+    else Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+  },
+  pomIncludeRepository := { _ => false },
+  publishArtifact in Test := false,
+  licenses := Seq("MIT License" -> url("https://opensource.org/licenses/mit-license.php")),
+  homepage := Some(url("https://github.com/lmnet/scala-js-preact")),
+  pomExtra := {
+    <scm>
+      <url>git@github.com:lmnet/scala-js-preact.git</url>
+      <connection>scm:git:git@github.com:lmnet/scala-js-preact.git</connection>
+    </scm>
+    <developers>
+      <developer>
+        <id>lmnet</id>
+        <name>Yuriy Badalyantc</name>
+        <email>lmnet89@gmail.com</email>
+      </developer>
+    </developers>
+  }
+)
+
+val commonSettings = publishSettings ++ Seq(
   organization := "com.github.lmnet",
   scalaVersion := scalaVer,
   scalacOptions ++= Seq(
