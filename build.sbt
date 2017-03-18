@@ -7,7 +7,7 @@ name := "scala-js-preact"
 scalaVersion := scalaVer
 
 val commonSettings = Seq(
-  organization := "com.lmnet",
+  organization := "com.github.lmnet",
   scalaVersion := scalaVer,
   scalacOptions ++= Seq(
     "-deprecation",
