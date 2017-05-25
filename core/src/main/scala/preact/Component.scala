@@ -50,21 +50,21 @@ private[preact] abstract class Component[Props, State] extends Preact.raw.Compon
     jsBase.asInstanceOf[js.UndefOr[dom.Element]].toOption
   }
 
-  protected def componentWillMount(): Unit = {}
+  protected def componentWillMount(): Unit = js.undefined
 
-  protected def componentDidMount(): Unit = {}
+  protected def componentDidMount(): Unit = js.undefined
 
-  protected def componentWillUnmount(): Unit = {}
+  protected def componentWillUnmount(): Unit = js.undefined
 
-  protected def componentDidUnmount(): Unit = {}
+  protected def componentDidUnmount(): Unit = js.undefined
 
-  protected def componentWillReceiveProps(props: Props): Unit = {}
+  protected def componentWillReceiveProps(props: Props): Unit = js.undefined
 
   protected def shouldComponentUpdate(props: Props): Boolean = true
 
-  protected def componentWillUpdate(): Unit = {}
+  protected def componentWillUpdate(): Unit = js.undefined
 
-  protected def componentDidUpdate(): Unit = {}
+  protected def componentDidUpdate(): Unit = js.undefined
 
   def render(): VNode
 }
