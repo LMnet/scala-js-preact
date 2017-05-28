@@ -1,36 +1,30 @@
 package todomvc
 
-import preact.Preact
 import preact.Preact.VNode
+import preact.macros.PreactComponent
 import todomvc.Model.Filter
 
-import scala.scalajs.js.annotation.ScalaJSDefined
-
-object FilterButton extends Preact.Factory.WithProps {
-
+object FilterButton {
   case class Props(filter: Filter, currentFilter: Filter)
+}
 
-  @ScalaJSDefined
-  class Component extends Preact.Component[Props, State] {
+import todomvc.FilterButton._
 
-    import preact.dsl.symbol._
+@PreactComponent[Unit]
+class FilterButton(props: Props) {
 
-    def render(): VNode = {
-      'li(
-        'a("href" -> s"#/${props.filter.path}",
-          if (props.currentFilter == props.filter) {
-            "class" -> "selected"
-          } else {
-            Entry.EmptyAttribute
-          },
-          props.filter.label
-        )
+  import preact.dsl.symbol._
+
+  def render(): VNode = {
+    'li(
+      'a("href" -> s"#/${props.filter.path}",
+        if (props.currentFilter == props.filter) {
+          "class" -> "selected"
+        } else {
+          Entry.EmptyAttribute
+        },
+        props.filter.label
       )
-    }
+    )
   }
-
-  def apply(filter: Filter, currentFilter: Filter): VNode = {
-    apply(Props(filter, currentFilter))
-  }
-
 }

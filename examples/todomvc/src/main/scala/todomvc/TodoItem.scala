@@ -2,13 +2,11 @@ package todomvc
 
 import org.scalajs.dom.raw.HTMLInputElement
 import org.scalajs.dom.{Event, KeyboardEvent}
-import preact.Preact
 import preact.Preact.VNode
+import preact.macros.PreactComponent
 import todomvc.Model.ItemId
 
-import scala.scalajs.js.annotation.ScalaJSDefined
-
-object TodoItem extends Preact.Factory.WithProps {
+object TodoItem {
 
   case class Props(item: Model.Item,
                    onToggle: ItemId => Unit,
@@ -16,91 +14,93 @@ object TodoItem extends Preact.Factory.WithProps {
                    onDestroy: ItemId => Unit)
 
   case class State(editing: Boolean)
+}
 
-  @ScalaJSDefined
-  class Component extends Preact.Component[Props, State] {
+import todomvc.TodoItem._
 
-    import preact.dsl.symbol._
+@PreactComponent[State]
+class TodoItem(props: Props) {
 
-    initialState(State(false))
+  import preact.dsl.symbol._
 
-    def toggle(): Unit = {
-      props.onToggle(props.item.id)
+  initialState(State(false))
+
+  def toggle(): Unit = {
+    props.onToggle(props.item.id)
+  }
+
+  def editStart(): Unit = {
+    setState(State(true))
+  }
+
+  def editingKeyDown(event: KeyboardEvent): Unit = {
+    event.keyCode match {
+      case Utils.KeyCodes.Enter =>
+        submit(event)
+
+      case Utils.KeyCodes.Escape =>
+        event.preventDefault()
+        setState(State(false))
+
+      case _ =>
+    }
+  }
+
+  def onBlur(event: Event): Unit = {
+    submit(event)
+  }
+
+  def submit(event: Event): Unit = {
+    val text = Utils.extractInputTarget(event).value.trim
+    event.preventDefault()
+    setState(State(false))
+
+    if (text.nonEmpty) {
+      updateItem(text)
+    } else {
+      destroy()
+    }
+  }
+
+  def updateItem(newText: String): Unit = {
+    props.updateItem(props.item.id, newText)
+  }
+
+  def destroy(): Unit = {
+    props.onDestroy(props.item.id)
+  }
+
+  override def componentDidUpdate(): Unit = {
+    base.get.querySelector(".edit") match {
+      case x: HTMLInputElement => x.focus()
+      case _ =>
+    }
+  }
+
+  def render(): VNode = {
+    val itemState = (props.item.checked, state.editing) match {
+      case (_, true) => "editing"
+      case (true, _) => "completed"
+      case _ => ""
     }
 
-    def editStart(): Unit = {
-      setState(State(true))
-    }
-
-    def editingKeyDown(event: KeyboardEvent): Unit = {
-      event.keyCode match {
-        case Utils.KeyCodes.Enter =>
-          submit(event)
-
-        case Utils.KeyCodes.Escape =>
-          event.preventDefault()
-          setState(State(false))
-
-        case _ =>
-      }
-    }
-
-    def onBlur(event: Event): Unit = {
-      submit(event)
-    }
-
-    def submit(event: Event): Unit = {
-      val text = Utils.extractInputTarget(event).value.trim
-      event.preventDefault()
-      setState(State(false))
-
-      if (text.nonEmpty) {
-        updateItem(text)
-      } else {
-        destroy()
-      }
-    }
-
-    def updateItem(newText: String): Unit = {
-      props.updateItem(props.item.id, newText)
-    }
-
-    def destroy(): Unit = {
-      props.onDestroy(props.item.id)
-    }
-
-    override def componentDidUpdate(): Unit = {
-      base.get.querySelector(".edit") match {
-        case x: HTMLInputElement => x.focus()
-        case _ =>
-      }
-    }
-
-    def render(): VNode = {
-      val itemState = (props.item.checked, state.editing) match {
-        case (_, true) => "editing"
-        case (true, _) => "completed"
-        case _ => ""
-      }
-
-      'li("class" -> itemState,
-        'div("class" -> "view",
-          'input("class" -> "toggle",
-            "type" -> "checkbox",
-            "checked" -> props.item.checked,
-            "onclick" -> toggle _
-          ),
-          'label("ondblclick" -> editStart _, props.item.title),
-          'button("class" -> "destroy",
-            "onclick" -> destroy _
-          )
+    'li("class" -> itemState,
+      'div("class" -> "view",
+        'input("class" -> "toggle",
+          "type" -> "checkbox",
+          "checked" -> props.item.checked,
+          "onclick" -> toggle _
         ),
-        'input("class" -> "edit",
-          "value" -> props.item.title,
-          "onkeydown" -> editingKeyDown _,
-          "onblur" -> onBlur _
+        'label("ondblclick" -> editStart _, props.item.title),
+        'button("class" -> "destroy",
+          "onclick" -> destroy _
         )
+      ),
+      'input("class" -> "edit",
+        "value" -> props.item.title,
+        "onkeydown" -> editingKeyDown _,
+        "onblur" -> onBlur _
       )
-    }
+    )
   }
 }

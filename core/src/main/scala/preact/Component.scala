@@ -2,7 +2,7 @@ package preact
 
 import org.scalajs.dom
 import preact.Preact.VNode
-
+import com.github.ghik.silencer.silent
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSName, ScalaJSDefined}
 
@@ -58,8 +58,10 @@ private[preact] abstract class Component[Props, State] extends Preact.raw.Compon
 
   protected def componentDidUnmount(): Unit = js.undefined
 
+  @silent
   protected def componentWillReceiveProps(props: Props): Unit = js.undefined
 
+  @silent
   protected def shouldComponentUpdate(props: Props): Boolean = true
 
   protected def componentWillUpdate(): Unit = js.undefined

@@ -3,10 +3,10 @@ package preact.raw
 import org.scalajs.dom
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSName
+import scala.scalajs.js.annotation.{JSGlobal, JSName}
 import scala.scalajs.js.|
 
-@JSName("preact")
+@JSGlobal("preact")
 @js.native
 private[preact] object RawPreact extends js.Object {
 
@@ -51,18 +51,18 @@ private[preact] object RawPreact extends js.Object {
 
     @JSName("props")
     @inline
-    private[preact] final def jsProps: js.Dynamic = js.native
+    final def jsProps: js.Dynamic = js.native
 
     @JSName("state")
     @inline
-    private[preact] final var jsState: js.Dynamic = js.native
+    final var jsState: js.Dynamic = js.native
 
     @JSName("setState")
-    private[preact] final def jsSetState(newState: js.Dynamic): Unit = js.native
+    final def jsSetState(newState: js.Dynamic): Unit = js.native
 
     @JSName("base")
     @inline
-    private[preact] final def jsBase: dom.Element = js.native
+    final def jsBase: dom.Element = js.native
 
     def render(): VNode
   }

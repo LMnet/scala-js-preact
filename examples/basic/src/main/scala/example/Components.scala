@@ -1,58 +1,51 @@
 package example
 
 import org.scalajs.dom
-import preact.Preact
 import preact.Preact.VNode
 import preact.dsl.symbol._
+import preact.macros.PreactComponent
 
-import scala.scalajs.js.annotation.ScalaJSDefined
+@PreactComponent[Unit]
+class StatelessComponent {
 
-object StatelessComponent extends Preact.Factory {
+  def onClick = () => {
+    dom.console.log("CLICK!")
+  }
 
-  type State = Unit
-
-  @ScalaJSDefined
-  class Component extends Preact.Component[Props, State] {
-
-    def onClick = () => {
-      dom.console.log("CLICK!")
-    }
-
-    def render(): VNode = {
-      'b("onclick" -> onClick, "Some bold text")
-    }
+  def render(): VNode = {
+    'b("onclick" -> onClick, "Some bold text")
   }
 }
 
-object StatefulComponent extends Preact.Factory {
 
+object StatefulComponent {
   case class State(name: String)
+}
 
-  @ScalaJSDefined
-  class Component extends Preact.Component[Props, State] {
+@PreactComponent[StatefulComponent.State](withChildren = true)
+class StatefulComponent {
 
-    initialState(State("Petya"))
+  import StatefulComponent._
 
-    override protected def componentDidMount(): Unit = {
-      setState(State("Grisha"))
-    }
+  initialState(State("Petya"))
 
-    def render(): VNode = {
-      'div(PropsComponent(PropsComponent.Props(state.name)), children)
-    }
+  override protected def componentDidMount(): Unit = {
+    setState(State("Grisha"))
+  }
+
+  def render(): VNode = {
+    'div(PropsComponent(state.name), children)
   }
 }
 
-object PropsComponent extends Preact.Factory.WithProps {
-
+object PropsComponent {
   case class Props(name: String)
-  type State = Unit
+}
 
-  @ScalaJSDefined
-  class Component extends Preact.Component[Props, State] {
+@PreactComponent[Unit]
+class PropsComponent(props: PropsComponent.Props) {
 
-    def render(): VNode = {
-      'p(props.name)
-    }
+  def render(): VNode = {
+    'p(props.name)
   }
 }
