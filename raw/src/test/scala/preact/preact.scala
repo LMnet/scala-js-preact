@@ -1,10 +1,9 @@
-import scala.concurrent.duration.{FiniteDuration, _}
+import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.util.Try
 
 package object preact {
-
   def delay[T](timeout: FiniteDuration)(body: => T): Future[T] = {
     val promise = Promise[T]()
     js.timers.setTimeout(timeout) {

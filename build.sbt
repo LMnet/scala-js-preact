@@ -1,4 +1,4 @@
-val scalaVer = "2.12.1"
+val scalaVer = "2.12.2"
 
 cancelable in Global := true
 
@@ -52,16 +52,45 @@ val commonSettings = Seq(
   publishArtifact := false
 )
 
+val withMacroParadise = Seq(
+  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M9" cross CrossVersion.full)
+)
+
 val lodashVersion = "4.17.3"
 
-lazy val core = project
+lazy val raw = project
   .enablePlugins(ScalaJSPlugin)
   .settings(
     commonSettings,
     publishSettings,
-    name := s"$projectName-core",
+    name := s"$projectName-raw",
+    scalacOptions -= "-Ywarn-unused",
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.1",
+      "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
+    ),
+    jsDependencies ++= Seq(
+      "org.webjars.npm" % "preact" % "7.2.0" / "dist/preact.min.js",
+      "org.webjars.npm" % "lodash" % lodashVersion / s"$lodashVersion/lodash.js" % "test"
+    )
+  )
+
+lazy val core = project
+  .enablePlugins(ScalaJSPlugin)
+  .dependsOn(raw % "compile->compile;test->test")
+  .aggregate(raw)
+  .settings(
+    commonSettings,
+    publishSettings,
+    name := s"$projectName-core",
+    resolvers += Resolver.bintrayIvyRepo("scalameta", "maven"),
+    addCompilerPlugin("com.github.ghik" %% "silencer-plugin" % "0.5"),
+    scalacOptions += "-Xplugin-require:macroparadise",
+    withMacroParadise,
+    libraryDependencies ++= Seq(
+      "com.github.ghik" %% "silencer-lib" % "0.5",
+      "org.scala-js" %%% "scalajs-dom" % "0.9.1",
+      "org.scalameta" %%% "scalameta" % "1.8.0",
       "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
     ),
     jsDependencies ++= Seq(
@@ -89,7 +118,10 @@ lazy val symbolDsl = project.in(file("./dsl/symbol"))
 lazy val basicExample = project.in(file("./examples/basic"))
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(symbolDsl)
-  .settings(commonSettings)
+  .settings(
+    commonSettings,
+    withMacroParadise
+  )
 
 lazy val todomvcExample = project.in(file("./examples/todomvc"))
   .enablePlugins(ScalaJSPlugin)
@@ -97,7 +129,7 @@ lazy val todomvcExample = project.in(file("./examples/todomvc"))
   .settings(
     commonSettings,
     libraryDependencies += "com.github.fomkin" %%% "pushka-json" % "0.8.0",
-    addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+    withMacroParadise
   )
 
 lazy val examples = project

@@ -4,105 +4,87 @@ import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLElement
 import org.scalatest.{AsyncFreeSpec, BeforeAndAfterEach}
 import preact.Preact.VNode
+import preact.macros.PreactComponent
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.ScalaJSDefined
 import scala.scalajs.runtime.UndefinedBehaviorError
 
 object PreactComponentTest {
 
-  object Simple extends Preact.Factory {
-
-    @ScalaJSDefined
-    class Component extends Preact.Component[Props, State] {
-
-      def render(): VNode = {
-        Preact.raw.h("p", null, "test")
-      }
+  @PreactComponent[Unit]
+  class Simple {
+    def render(): VNode = {
+      Preact.raw.h("p", null, "test")
     }
   }
 
-  object WithChildren extends Preact.Factory {
-
-    @ScalaJSDefined
-    class Component extends Preact.Component[Props, State] {
-
-      def render(): VNode = {
-        Preact.raw.h("div", null, children: _*)
-      }
+  @PreactComponent[Unit](withChildren = true)
+  class WithChildren {
+    def render(): VNode = {
+      Preact.raw.h("div", null, children: _*)
     }
   }
 
-  object WithProps extends Preact.Factory.WithProps {
-
+  object WithProps {
     case class Props(name: String)
-
-    @ScalaJSDefined
-    class Component extends Preact.Component[Props, State] {
-
-      def render(): VNode = {
-        Preact.raw.h("p", null, props.name)
-      }
+  }
+  @PreactComponent[Unit]
+  class WithProps(props: WithProps.Props) {
+    def render(): VNode = {
+      Preact.raw.h("p", null, props.name)
     }
   }
 
-  object WithPropsAndChildren extends Preact.Factory.WithProps {
-
+  object WithPropsAndChildren {
     case class Props(key: String, value: String)
-
-    @ScalaJSDefined
-    class Component extends Preact.Component[Props, State] {
-
-      def render(): VNode = {
-        Preact.raw.h("div", js.Dictionary[js.Any](props.key -> props.value), children: _*)
-      }
+  }
+  @PreactComponent[Unit](withChildren = true)
+  class WithPropsAndChildren(props: WithPropsAndChildren.Props) {
+    def render(): VNode = {
+      Preact.raw.h("div", js.Dictionary[js.Any](props.key -> props.value), children: _*)
     }
   }
 
-  object WithState extends Preact.Factory {
-
+  object WithState {
     case class State(name: String)
+  }
+  @PreactComponent[WithState.State]
+  class WithState {
+    import WithState._
 
-    @ScalaJSDefined
-    class Component extends Preact.Component[Props, State] {
+    initialState(State("test"))
 
-      initialState(State("test"))
+    def onClick(): Unit = {
+      setState(State("clicked"))
+    }
 
-      def onClick(): Unit = {
-        setState(State("clicked"))
-      }
-
-      def render(): VNode = {
-        Preact.raw.h("p", js.Dictionary[js.Any]("onclick" -> onClick _), state.name)
-      }
+    def render(): VNode = {
+      Preact.raw.h("p", js.Dictionary[js.Any]("onclick" -> onClick _), state.name)
     }
   }
 
-  object WithoutInitialState extends Preact.Factory {
-
+  object WithoutInitialState {
     case class State(name: String)
-
-    @ScalaJSDefined
-    class Component extends Preact.Component[Props, State] {
-      def render(): VNode = {
-        Preact.raw.h("p", null, state.name)
-      }
+  }
+  @PreactComponent[WithoutInitialState.State]
+  class WithoutInitialState {
+    def render(): VNode = {
+      Preact.raw.h("p", null, state.name)
     }
   }
 
-  object DoubleInitialState extends Preact.Factory {
-
+  object DoubleInitialState {
     case class State(name: String)
+  }
+  @PreactComponent[DoubleInitialState.State]
+  class DoubleInitialState {
+    import DoubleInitialState._
 
-    @ScalaJSDefined
-    class Component extends Preact.Component[Props, State] {
+    initialState(State("test1"))
+    initialState(State("test2"))
 
-      initialState(State("test1"))
-      initialState(State("test2"))
-
-      def render(): VNode = {
-        Preact.raw.h("p", null, state.name)
-      }
+    def render(): VNode = {
+      Preact.raw.h("p", null, state.name)
     }
   }
 }
@@ -132,10 +114,6 @@ class PreactComponentTest extends AsyncFreeSpec with BeforeAndAfterEach {
     }
     "apply(children)" - {
       "should construct component" - {
-        "without children" in {
-          Preact.render(Simple(Preact.raw.h("b", null, "test")), dom.document.body)
-          assert(dom.document.body.innerHTML == """<p>test</p>""")
-        }
         "with children" in {
           Preact.render(WithChildren(Preact.raw.h("b", null, "test")), dom.document.body)
           assert(dom.document.body.innerHTML == """<div><b>test</b></div>""")
@@ -156,10 +134,6 @@ class PreactComponentTest extends AsyncFreeSpec with BeforeAndAfterEach {
     }
     "apply(props, children)" - {
       "should construct component" - {
-        "without children" in {
-          Preact.render(WithProps(WithProps.Props("test"), Preact.raw.h("b", null, "test")), dom.document.body)
-          assert(dom.document.body.innerHTML == """<p>test</p>""")
-        }
         "with children" in {
           Preact.render(WithPropsAndChildren(
             WithPropsAndChildren.Props("testKey", "testValue"),

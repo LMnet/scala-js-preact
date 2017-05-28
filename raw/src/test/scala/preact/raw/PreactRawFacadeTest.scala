@@ -1,10 +1,9 @@
-package preact
+package preact.raw
 
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLElement
 import org.scalatest.{AsyncFreeSpec, BeforeAndAfterEach}
-import preact.Preact.VNode
-import preact.raw.RawPreact.{Attributes, h}
+import preact.raw.RawPreact._
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.ScalaJSDefined
@@ -14,14 +13,14 @@ object PreactRawFacadeTest {
   var dynVar: js.Dynamic = null
 
   @ScalaJSDefined
-  class SimpleComponent extends Preact.raw.Component {
+  class SimpleComponent extends Component {
     def render(): VNode = {
       h("div", null, "test")
     }
   }
 
   @ScalaJSDefined
-  class PropsComponent extends Preact.raw.Component {
+  class PropsComponent extends Component {
     def render(): VNode = {
       dynVar = jsProps
       h("div", jsProps.asInstanceOf[Attributes], "test")
@@ -29,23 +28,23 @@ object PreactRawFacadeTest {
   }
 
   @ScalaJSDefined
-  class ChildrenComponent extends Preact.raw.Component {
+  class ChildrenComponent extends Component {
     def render(): VNode = {
-      val children = jsProps.children.asInstanceOf[js.Array[Preact.raw.Child]]
+      val children = jsProps.children.asInstanceOf[js.Array[Child]]
       h("div", null, children: _*)
     }
   }
 
   @ScalaJSDefined
-  class PropsChildrenComponent extends Preact.raw.Component {
+  class PropsChildrenComponent extends Component {
     def render(): VNode = {
-      val children = jsProps.children.asInstanceOf[js.Array[Preact.raw.Child]]
+      val children = jsProps.children.asInstanceOf[js.Array[Child]]
       h("div", jsProps.asInstanceOf[Attributes], children: _*)
     }
   }
 
   @ScalaJSDefined
-  class StateComponent extends Preact.raw.Component {
+  class StateComponent extends Component {
 
     jsState = js.Dynamic.literal(foo = 1, bar = "lol")
 
@@ -56,7 +55,7 @@ object PreactRawFacadeTest {
   }
 
   @ScalaJSDefined
-  class SetStateComponent extends Preact.raw.Component {
+  class SetStateComponent extends Component {
 
     jsState = js.Dynamic.literal(foo = 1)
 
@@ -74,7 +73,7 @@ object PreactRawFacadeTest {
   }
 
   @ScalaJSDefined
-  class EventComponent extends Preact.raw.Component {
+  class EventComponent extends Component {
     def render(): VNode = {
       dynVar = jsBase.asInstanceOf[js.Dynamic]
       val callback = () => {
@@ -98,59 +97,59 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
     dom.document.body.innerHTML = ""
   }
 
-  "Preact.raw.render" - {
+  "render" - {
     "should render nodes in the body" in {
-      Preact.raw.render(h("div", null, "Test node"), dom.document.body)
+      render(h("div", null, "Test node"), dom.document.body)
       assert(dom.document.body.innerHTML == "<div>Test node</div>")
     }
 
     "should render nodes in the specific container" in {
       dom.document.body.innerHTML = """<div id="container"></div>"""
-      Preact.raw.render(h("div", null, "Test node"), dom.document.getElementById("container"))
+      render(h("div", null, "Test node"), dom.document.getElementById("container"))
       assert(dom.document.body.innerHTML == """<div id="container"><div>Test node</div></div>""")
     }
 
     "should merge nodes if mergeWith is set" in {
       dom.document.body.innerHTML = """<div foo="bar"></div>"""
-      Preact.raw.render(h("div", null, "Test node"), dom.document.body)
+      render(h("div", null, "Test node"), dom.document.body)
       assert(dom.document.body.innerHTML == """<div foo="bar"></div><div>Test node</div>""")
     }
   }
 
-  "Preact.raw.h" - {
+  "h" - {
     "should render single DOM node" - {
       "without attributes and children" in {
-        Preact.raw.render(h("p", null, null), dom.document.body)
+        render(h("p", null, null), dom.document.body)
         assert(dom.document.body.innerHTML == "<p></p>")
       }
 
       "with attributes" in {
-        Preact.raw.render(h("p", js.Dictionary[js.Any]("foo" -> "bar", "baz" -> "test"), null), dom.document.body)
+        render(h("p", js.Dictionary[js.Any]("foo" -> "bar", "baz" -> "test"), null), dom.document.body)
         assert(dom.document.body.innerHTML == """<p foo="bar" baz="test"></p>""")
       }
 
       "with VNode child" in {
-        Preact.raw.render(h("div", null, h("p", null, null)), dom.document.body)
+        render(h("div", null, h("p", null, null)), dom.document.body)
         assert(dom.document.body.innerHTML == """<div><p></p></div>""")
       }
 
       "with VNode children" in {
-        Preact.raw.render(h("div", null, h("p", null, null), h("b", null, null)), dom.document.body)
+        render(h("div", null, h("p", null, null), h("b", null, null)), dom.document.body)
         assert(dom.document.body.innerHTML == """<div><p></p><b></b></div>""")
       }
 
       "with string child" in {
-        Preact.raw.render(h("div", null, "test"), dom.document.body)
+        render(h("div", null, "test"), dom.document.body)
         assert(dom.document.body.innerHTML == """<div>test</div>""")
       }
 
       "with string children" in {
-        Preact.raw.render(h("div", null, "test1", "test2"), dom.document.body)
+        render(h("div", null, "test1", "test2"), dom.document.body)
         assert(dom.document.body.innerHTML == """<div>test1test2</div>""")
       }
 
       "with combined string and VNode children" in {
-        Preact.raw.render(h("div", null, h("p", null, null), "test1", h("b", null, null), "test2"), dom.document.body)
+        render(h("div", null, h("p", null, null), "test1", h("b", null, null), "test2"), dom.document.body)
         assert(dom.document.body.innerHTML == """<div><p></p>test1<b></b>test2</div>""")
       }
     }
@@ -161,7 +160,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
           h("div", null, "test")
         }
 
-        Preact.raw.render(h(component, null, null), dom.document.body)
+        render(h(component, null, null), dom.document.body)
         assert(dom.document.body.innerHTML == """<div>test</div>""")
       }
 
@@ -170,7 +169,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
           h("div", null, "test")
         }
 
-        Preact.raw.render(h(component, null, null), dom.document.body)
+        render(h(component, null, null), dom.document.body)
         assert(dom.document.body.innerHTML == """<div>test</div>""")
       }
     }
@@ -181,7 +180,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
           h("div", js.Dictionary[js.Any]("foo" -> props.num), null)
         }
 
-        Preact.raw.render(
+        render(
           h(component, js.Dictionary[js.Any]("num" -> 1), null),
           dom.document.body
         )
@@ -190,11 +189,11 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
 
       "when only children is passed to component" in {
         val component = (props: js.Dynamic) => {
-          val children = props.children.asInstanceOf[js.Array[Preact.raw.Child]]
+          val children = props.children.asInstanceOf[js.Array[Child]]
           h("div", null, children: _*)
         }
 
-        Preact.raw.render(
+        render(
           h(component, null, h("p", null, "test")),
           dom.document.body
         )
@@ -203,12 +202,12 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
 
       "when props and children is passed to component" in {
         val component = (props: js.Dynamic) => {
-          val children = props.children.asInstanceOf[js.Array[Preact.raw.Child]]
+          val children = props.children.asInstanceOf[js.Array[Child]]
           val attributes = js.Dictionary[js.Any]("foo" -> props.num)
           h("div", attributes, children: _*)
         }
 
-        Preact.raw.render(
+        render(
           h(component, js.Dictionary[js.Any]("num" -> 1), h("p", null, "test")),
           dom.document.body
         )
@@ -218,7 +217,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
 
     "should render class component" - {
       "when component doesn't have props and children" in {
-        Preact.raw.render(
+        render(
           h(js.constructorOf[SimpleComponent], null, null),
           dom.document.body
         )
@@ -226,7 +225,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
       }
 
       "when component have props" in {
-        Preact.raw.render(
+        render(
           h(js.constructorOf[PropsComponent], js.Dictionary[js.Any]("foo" -> "bar"), null),
           dom.document.body
         )
@@ -234,7 +233,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
       }
 
       "when component have children" in {
-        Preact.raw.render(
+        render(
           h(js.constructorOf[ChildrenComponent], null, h("p", null, "test")),
           dom.document.body
         )
@@ -243,7 +242,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
 
       "when component have props and children" in {
         val props = js.Dictionary[js.Any]("foo" -> "bar")
-        Preact.raw.render(
+        render(
           h(js.constructorOf[PropsChildrenComponent], props, h("p", null, "test")),
           dom.document.body
         )
@@ -252,11 +251,11 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
     }
   }
 
-  "Preact.raw.Component" - {
+  "Component" - {
     "jsProps should give access to the props" in {
       val props = js.Dynamic.literal(foo = 3, bar = "lol")
-      val attrs = props.asInstanceOf[Preact.raw.Attributes]
-      Preact.raw.render(
+      val attrs = props.asInstanceOf[Attributes]
+      render(
         h(js.constructorOf[PropsComponent], attrs, null),
         dom.document.body
       )
@@ -268,7 +267,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
 
     "jsState should give access to the state" in {
       val expectedState = js.Dynamic.literal(foo = 1, bar = "lol")
-      Preact.raw.render(
+      render(
         h(js.constructorOf[StateComponent], null, null),
         dom.document.body
       )
@@ -282,7 +281,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
     "jsSetState should be able to update state" in {
       val beforeUpdateExpected = js.Dynamic.literal(foo = 1)
       val afterUpdateExpected = js.Dynamic.literal(foo = 2)
-      Preact.raw.render(
+      render(
         h(js.constructorOf[SetStateComponent], null, null),
         dom.document.body
       )
@@ -292,7 +291,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
       val componentElement = dom.document.getElementById("set-state-component").asInstanceOf[HTMLElement]
       componentElement.click()
 
-      nextTick {
+      preact.nextTick {
         assert(lodash.isEqual(afterUpdateExpected, dynVar).asInstanceOf[Boolean])
       }
     }
@@ -300,7 +299,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
     "base should returns attached node" in {
       dom.document.body.innerHTML = """<div id="container"></div>"""
       val container = dom.document.getElementById("container")
-      Preact.raw.render(
+      render(
         h(js.constructorOf[EventComponent], null, null),
         container
       )
@@ -310,7 +309,7 @@ class PreactRawFacadeTest extends AsyncFreeSpec with BeforeAndAfterEach {
       val componentElement = dom.document.getElementById("event-component").asInstanceOf[HTMLElement]
       componentElement.click()
 
-      nextTick {
+      preact.nextTick {
         assert(dynVar == componentElement)
       }
     }

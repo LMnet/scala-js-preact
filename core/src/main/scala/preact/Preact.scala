@@ -12,10 +12,6 @@ object Preact {
 
   type Component[Props, State] = preact.Component[Props, State]
 
-  type Factory = preact.Factory
-
-  val Factory = preact.Factory
-
   val FunctionFactory = preact.FunctionFactory
 
   object FunctionComponent {
