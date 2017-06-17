@@ -1,10 +1,10 @@
-package preact
+package preact.macros
 
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLElement
 import org.scalatest.{AsyncFreeSpec, BeforeAndAfterEach}
+import preact.Preact
 import preact.Preact.VNode
-import preact.macros.PreactComponent
 
 import scala.scalajs.js
 import scala.scalajs.runtime.UndefinedBehaviorError
