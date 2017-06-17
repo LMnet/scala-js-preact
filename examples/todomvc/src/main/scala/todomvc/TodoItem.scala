@@ -18,8 +18,8 @@ object TodoItem {
 
 import todomvc.TodoItem._
 
-@PreactComponent[State]
-class TodoItem(props: Props) {
+@PreactComponent[Props, State]
+class TodoItem {
 
   import preact.dsl.symbol._
 

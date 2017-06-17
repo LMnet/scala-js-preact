@@ -12,17 +12,14 @@ object Main extends JSApp {
   def main(): Unit = {
     val root = dom.document.getElementById("scala")
 
-    val props1 = FunctionComponents.Props(5)
-    val props2 = FunctionComponents.Props(10)
-
     val appClass = StatefulComponent(
-      'p("NANAN"),
+      'p("Test"),
       StatelessComponent(),
       FunctionComponents.withChildren(
         FunctionComponents.withPropsAndChildren(
-          props2,
+          FunctionComponents.Props(10),
           FunctionComponents.simple(),
-          FunctionComponents.withProps(props1)
+          FunctionComponents.withProps(FunctionComponents.Props(5))
         )
       )
     )

@@ -11,14 +11,14 @@ import scala.scalajs.runtime.UndefinedBehaviorError
 
 object PreactComponentTest {
 
-  @PreactComponent[Unit]
+  @PreactComponent[Unit, Unit]
   class Simple {
     def render(): VNode = {
       Preact.raw.h("p", null, "test")
     }
   }
 
-  @PreactComponent[Unit](withChildren = true)
+  @PreactComponent[Unit, Unit](withChildren = true)
   class WithChildren {
     def render(): VNode = {
       Preact.raw.h("div", null, children: _*)
@@ -28,8 +28,8 @@ object PreactComponentTest {
   object WithProps {
     case class Props(name: String)
   }
-  @PreactComponent[Unit]
-  class WithProps(props: WithProps.Props) {
+  @PreactComponent[WithProps.Props, Unit]
+  class WithProps {
     def render(): VNode = {
       Preact.raw.h("p", null, props.name)
     }
@@ -38,8 +38,8 @@ object PreactComponentTest {
   object WithPropsAndChildren {
     case class Props(key: String, value: String)
   }
-  @PreactComponent[Unit](withChildren = true)
-  class WithPropsAndChildren(props: WithPropsAndChildren.Props) {
+  @PreactComponent[WithPropsAndChildren.Props, Unit](withChildren = true)
+  class WithPropsAndChildren {
     def render(): VNode = {
       Preact.raw.h("div", js.Dictionary[js.Any](props.key -> props.value), children: _*)
     }
@@ -48,7 +48,7 @@ object PreactComponentTest {
   object WithState {
     case class State(name: String)
   }
-  @PreactComponent[WithState.State]
+  @PreactComponent[Unit, WithState.State]
   class WithState {
     import WithState._
 
@@ -66,7 +66,7 @@ object PreactComponentTest {
   object WithoutInitialState {
     case class State(name: String)
   }
-  @PreactComponent[WithoutInitialState.State]
+  @PreactComponent[Unit, WithoutInitialState.State]
   class WithoutInitialState {
     def render(): VNode = {
       Preact.raw.h("p", null, state.name)
@@ -76,7 +76,7 @@ object PreactComponentTest {
   object DoubleInitialState {
     case class State(name: String)
   }
-  @PreactComponent[DoubleInitialState.State]
+  @PreactComponent[Unit, DoubleInitialState.State]
   class DoubleInitialState {
     import DoubleInitialState._
 
@@ -99,7 +99,7 @@ class PreactComponentTest extends AsyncFreeSpec with BeforeAndAfterEach {
     dom.document.body.innerHTML = ""
   }
 
-  "Preact.Factory" - {
+  "PreactComponent" - {
     "apply()" - {
       "should construct component" - {
         "without children" in {
