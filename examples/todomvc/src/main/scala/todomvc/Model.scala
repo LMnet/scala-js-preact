@@ -49,7 +49,7 @@ object Model {
   }
 
   def load(): Seq[Item] = {
-    read[Seq[Item]](dom.window.localStorage.getItem(storageKey))
+    Option(dom.window.localStorage.getItem(storageKey)).fold(Seq.empty[Item])(read[Seq[Item]])
   }
 
 }

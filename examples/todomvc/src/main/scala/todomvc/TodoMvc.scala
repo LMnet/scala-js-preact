@@ -45,24 +45,27 @@ object TodoMvc {
   }
 }
 
-@PreactComponent[TodoMvc.State]
-class TodoMvc(props: TodoMvc.Props) {
+@PreactComponent[TodoMvc.Props, TodoMvc.State]
+class TodoMvc(initialProps: TodoMvc.Props) {
 
   import TodoMvc._
   import preact.dsl.symbol._
 
   def todosFilter(): Filter = {
-    dom.window.location.hash.split("/")(1) match {
-      case Filter.Active.path => Filter.Active
-      case Filter.Completed.path => Filter.Completed
+    dom.window.location.hash.split("/").toList match {
+      case _ :: filter :: _ => filter match {
+        case Filter.Active.path => Filter.Active
+        case Filter.Completed.path => Filter.Completed
+        case _ => Filter.All
+      }
       case _ => Filter.All
     }
   }
 
-  implicit private val persist = props.persist
+  implicit private val persist = initialProps.persist
 
   initialState(State(
-    todos = props.initialTodos,
+    todos = initialProps.initialTodos,
     newTodo = "",
     filter = todosFilter()
   ))

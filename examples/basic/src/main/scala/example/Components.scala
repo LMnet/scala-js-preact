@@ -5,7 +5,7 @@ import preact.Preact.VNode
 import preact.dsl.symbol._
 import preact.macros.PreactComponent
 
-@PreactComponent[Unit]
+@PreactComponent[Unit, Unit]
 class StatelessComponent {
 
   def onClick = () => {
@@ -22,15 +22,15 @@ object StatefulComponent {
   case class State(name: String)
 }
 
-@PreactComponent[StatefulComponent.State](withChildren = true)
+@PreactComponent[Unit, StatefulComponent.State](withChildren = true)
 class StatefulComponent {
 
   import StatefulComponent._
 
-  initialState(State("Petya"))
+  initialState(State("Foo"))
 
   override protected def componentDidMount(): Unit = {
-    setState(State("Grisha"))
+    setState(State("Bar"))
   }
 
   def render(): VNode = {
@@ -42,8 +42,8 @@ object PropsComponent {
   case class Props(name: String)
 }
 
-@PreactComponent[Unit]
-class PropsComponent(props: PropsComponent.Props) {
+@PreactComponent[PropsComponent.Props, Unit]
+class PropsComponent {
 
   def render(): VNode = {
     'p(props.name)

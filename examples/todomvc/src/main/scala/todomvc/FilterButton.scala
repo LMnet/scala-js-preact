@@ -10,8 +10,8 @@ object FilterButton {
 
 import todomvc.FilterButton._
 
-@PreactComponent[Unit]
-class FilterButton(props: Props) {
+@PreactComponent[Props, Unit]
+class FilterButton {
 
   import preact.dsl.symbol._
 
