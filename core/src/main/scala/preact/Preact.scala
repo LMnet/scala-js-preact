@@ -12,23 +12,6 @@ object Preact {
 
   type Component[Props, State] = preact.Component[Props, State]
 
-  val FunctionFactory = preact.FunctionFactory
-
-  object FunctionComponent {
-
-    trait WithProps[Props] {
-      def apply(props: Props): VNode
-    }
-
-    trait WithChildren {
-      def apply(children: Child*): VNode
-    }
-
-    trait WithPropsAndChildren[Props] {
-      def apply(props: Props, children: Child*): VNode
-    }
-  }
-
   def render(node: VNode, parent: dom.Element): dom.Element = raw.render(node, parent)
   def render(node: VNode, parent: dom.Element, mergeWith: dom.Element): dom.Element =
     raw.render(node, parent, mergeWith)
