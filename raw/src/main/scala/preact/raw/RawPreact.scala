@@ -34,7 +34,7 @@ private[preact] object RawPreact extends js.Object {
         children: Child*): VNode = js.native
 
   def h(node: PropsFunctionComponent,
-        params: js.Dictionary[js.Any],
+        params: Attributes,
         children: Child*): VNode = js.native
 
   def h(node: String,

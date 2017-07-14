@@ -6,8 +6,5 @@ scala-js-preact
 TODO
 ----
 
-* Publishing
 * Docs
-* 2.11/2.12 cross-compilation
-* Scalatags DSL
 * Diode integration

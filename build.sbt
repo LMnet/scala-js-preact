@@ -114,6 +114,20 @@ lazy val symbolDsl = project.in(file("./dsl/symbol"))
     )
   )
 
+lazy val tagsDsl = project.in(file("./dsl/tags"))
+  .enablePlugins(ScalaJSPlugin)
+  .dependsOn(core)
+  .settings(
+    commonSettings,
+    publishSettings,
+    name := s"$projectName-dsl-tags",
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
+    ),
+    jsDependencies ++= Seq(
+      "org.webjars.npm" % "lodash" % lodashVersion / s"$lodashVersion/lodash.js" % "test"
+    )
+  )
 
 lazy val basicExample = project.in(file("./examples/basic"))
   .enablePlugins(ScalaJSPlugin)
@@ -136,4 +150,4 @@ lazy val examples = project
   .aggregate(basicExample, todomvcExample)
 
 lazy val root = project.in(file("."))
-  .aggregate(core, symbolDsl, examples)
+  .aggregate(core, symbolDsl, tagsDsl, examples)
