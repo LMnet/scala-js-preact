@@ -73,7 +73,7 @@ class SymbolDslTest extends FreeSpec {
             val node = 'div("foo" -> "bar")
             val expected = h("div", js.Dictionary[js.Any](
               "foo" -> "bar"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
 
@@ -87,7 +87,7 @@ class SymbolDslTest extends FreeSpec {
             val node = 'div("foo" -> a)
             val expected = h("div", js.Dictionary[js.Any](
               "foo" -> "test"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }

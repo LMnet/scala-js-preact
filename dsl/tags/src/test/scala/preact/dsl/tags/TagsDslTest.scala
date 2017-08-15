@@ -71,7 +71,7 @@ class TagsDslTest extends FreeSpec {
           val node = div(attr)
           val expected = h("div", js.Dictionary[js.Any](
             "id" -> "test"
-          ), null)
+          ))
           assert(isEqual(node, expected))
         }
 
@@ -81,7 +81,7 @@ class TagsDslTest extends FreeSpec {
             val node = a(attr)
             val expected = h("a", js.Dictionary[js.Any](
               "target" -> "_blank"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }
@@ -92,7 +92,7 @@ class TagsDslTest extends FreeSpec {
             val node = a(attr)
             val expected = h("a", js.Dictionary[js.Any](
               "disabled" -> ""
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }
@@ -103,7 +103,7 @@ class TagsDslTest extends FreeSpec {
             val node = div(attr)
             val expected = h("div", js.Dictionary[js.Any](
               "accesskey" -> "a,b"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }
@@ -114,7 +114,7 @@ class TagsDslTest extends FreeSpec {
             val node = div(attr)
             val expected = h("div", js.Dictionary[js.Any](
               "class" -> "foo bar"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }
@@ -125,7 +125,7 @@ class TagsDslTest extends FreeSpec {
             val node = div(attr)
             val expected = h("div", js.Dictionary[js.Any](
               "accept" -> "foo,bar"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }
@@ -136,7 +136,7 @@ class TagsDslTest extends FreeSpec {
             val node = div(attr)
             val expected = h("div", js.Dictionary[js.Any](
               "contenteditable" -> "true"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }
@@ -148,7 +148,7 @@ class TagsDslTest extends FreeSpec {
             val node = div(attr)
             val expected = h("div", js.Dictionary[js.Any](
               "for" -> "test"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }
@@ -159,7 +159,7 @@ class TagsDslTest extends FreeSpec {
             val node = div(attr)
             val expected = h("div", js.Dictionary[js.Any](
               "size" -> 5
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }
@@ -170,7 +170,7 @@ class TagsDslTest extends FreeSpec {
             val node = a(attr)
             val expected = h("a", js.Dictionary[js.Any](
               "href" -> "http://github.com"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }
@@ -181,7 +181,7 @@ class TagsDslTest extends FreeSpec {
             val node = div(attr)
             val expected = h("div", js.Dictionary[js.Any](
               "coords" -> "1,2,3,4,5"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }
@@ -193,7 +193,7 @@ class TagsDslTest extends FreeSpec {
             val node = div(attr)
             val expected = h("div", js.Dictionary[js.Any](
               "pattern" -> ".*"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
 
@@ -203,7 +203,7 @@ class TagsDslTest extends FreeSpec {
             val node = div(attr)
             val expected = h("div", js.Dictionary[js.Any](
               "pattern" -> ".*"
-            ), null)
+            ))
             assert(isEqual(node, expected))
           }
         }
@@ -220,7 +220,7 @@ class TagsDslTest extends FreeSpec {
               val node = div(onclick := fun)
               val expected = h("div", js.Dictionary[js.Any](
                 "onclick" -> fun
-              ), null)
+              ))
 
               assert(
                 node.attributes.get("onclick").asInstanceOf[js.Function0[UUID]]() ==
@@ -234,7 +234,7 @@ class TagsDslTest extends FreeSpec {
               val node = div(onclick := fun)
               val expected = h("div", js.Dictionary[js.Any](
                 "onclick" -> fun
-              ), null)
+              ))
 
               assert(
                 node.attributes.get("onclick").asInstanceOf[js.Function1[String, UUID]]("test") ==
@@ -248,7 +248,7 @@ class TagsDslTest extends FreeSpec {
               val node = div(onclick := fun)
               val expected = h("div", js.Dictionary[js.Any](
                 "onclick" -> fun
-              ), null)
+              ))
 
               assert(
                 node.attributes.get("onclick").asInstanceOf[js.Function2[String, String, UUID]]("test", "test") ==
@@ -264,7 +264,7 @@ class TagsDslTest extends FreeSpec {
           val node = div(`class` := "test")
           val expected = h("div", js.Dictionary[js.Any](
             "class" -> "test"
-          ), null)
+          ))
           assert(isEqual(node, expected))
         }
 
@@ -273,7 +273,7 @@ class TagsDslTest extends FreeSpec {
           val expected = h("a", js.Dictionary[js.Any](
             "href" -> "/",
             "target" -> "_blank"
-          ), null)
+          ))
           assert(isEqual(node, expected))
         }
 

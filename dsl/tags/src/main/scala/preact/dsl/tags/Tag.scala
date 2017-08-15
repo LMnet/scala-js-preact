@@ -43,11 +43,16 @@ class Tag(val name: String) {
             acc
 
           case Entry.EmptyChild =>
-            acc
+            // https://github.com/developit/preact/issues/540
+            (acc._1, acc._2 ++ null)
         }
       }
     val vnodeAttributes = if (attributes.isEmpty) null else attributes
-    Preact.raw.h(name, vnodeAttributes, children: _*)
+    if (children.isEmpty) {
+      Preact.raw.h(name, vnodeAttributes)
+    } else {
+      Preact.raw.h(name, vnodeAttributes, children: _*)
+    }
   }
 }
 

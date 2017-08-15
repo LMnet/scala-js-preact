@@ -31,11 +31,16 @@ package object symbol extends EntryImplicits {
               acc
 
             case Entry.EmptyChild =>
-              acc
+              // https://github.com/developit/preact/issues/540
+              (acc._1, acc._2 ++ null)
           }
         }
       val vnodeAttributes = if (attributes.isEmpty) null else attributes
-      Preact.raw.h(self.name, vnodeAttributes, children: _*)
+      if (children.isEmpty) {
+        Preact.raw.h(self.name, vnodeAttributes)
+      } else {
+        Preact.raw.h(self.name, vnodeAttributes, children: _*)
+      }
     }
   }
 

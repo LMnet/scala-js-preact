@@ -11,7 +11,7 @@ val publishSettings = Seq(
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-    else Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    else Some("releases" at nexus + "service/local/staging/deploy/maven2")
   },
   pomIncludeRepository := { _ => false },
   publishArtifact := true,
@@ -56,7 +56,9 @@ val withMacroParadise = Seq(
   addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M9" cross CrossVersion.full)
 )
 
-val lodashVersion = "4.17.3"
+val lodashJsTestDep = "org.webjars.npm" % "lodash" % "4.17.3" / s"4.17.3/lodash.js" % "test"
+val scalajsDomDep = Def.setting("org.scala-js" %%% "scalajs-dom" % "0.9.1")
+val scalatestTestDep = Def.setting("org.scalatest" %%% "scalatest" % "3.0.1" % "test")
 
 lazy val raw = project
   .enablePlugins(ScalaJSPlugin)
@@ -66,12 +68,12 @@ lazy val raw = project
     name := s"$projectName-raw",
     scalacOptions -= "-Ywarn-unused",
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.1",
-      "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
+      scalajsDomDep.value,
+      scalatestTestDep.value
     ),
     jsDependencies ++= Seq(
-      "org.webjars.npm" % "preact" % "7.2.0" / "dist/preact.min.js",
-      "org.webjars.npm" % "lodash" % lodashVersion / s"$lodashVersion/lodash.js" % "test"
+      "org.webjars.npm" % "preact" % "8.2.1" / "dist/preact.min.js",
+      lodashJsTestDep
     )
   )
 
@@ -89,13 +91,7 @@ lazy val core = project
     withMacroParadise,
     libraryDependencies ++= Seq(
       "com.github.ghik" %% "silencer-lib" % "0.5",
-      "org.scala-js" %%% "scalajs-dom" % "0.9.1",
-      "org.scalameta" %%% "scalameta" % "1.8.0",
-      "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
-    ),
-    jsDependencies ++= Seq(
-      "org.webjars.npm" % "preact" % "7.2.0" / "dist/preact.min.js",
-      "org.webjars.npm" % "lodash" % lodashVersion / s"$lodashVersion/lodash.js" % "test"
+      "org.scalameta" %%% "scalameta" % "1.8.0"
     )
   )
 
@@ -107,10 +103,10 @@ lazy val symbolDsl = project.in(file("./dsl/symbol"))
     publishSettings,
     name := s"$projectName-dsl-symbol",
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
+      scalatestTestDep.value
     ),
     jsDependencies ++= Seq(
-      "org.webjars.npm" % "lodash" % lodashVersion / s"$lodashVersion/lodash.js" % "test"
+      lodashJsTestDep
     )
   )
 
@@ -122,10 +118,10 @@ lazy val tagsDsl = project.in(file("./dsl/tags"))
     publishSettings,
     name := s"$projectName-dsl-tags",
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
+      scalatestTestDep.value
     ),
     jsDependencies ++= Seq(
-      "org.webjars.npm" % "lodash" % lodashVersion / s"$lodashVersion/lodash.js" % "test"
+      lodashJsTestDep
     )
   )
 
