@@ -56,8 +56,6 @@ private[preact] abstract class Component[Props, State] extends Preact.raw.Compon
 
   protected def componentWillUnmount(): Unit = js.undefined
 
-  protected def componentDidUnmount(): Unit = js.undefined
-
   @silent
   protected def componentWillReceiveProps(props: Props): Unit = js.undefined
 

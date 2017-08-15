@@ -25,21 +25,49 @@ private[preact] object RawPreact extends js.Object {
   type FunctionComponent = js.Function0[VNode]
   type PropsFunctionComponent = js.Function1[js.Dynamic, VNode]
 
-  def h(node: js.Dynamic,
-        params: Attributes,
-        children: Child*): VNode = js.native
+  def h(
+    node: js.Dynamic,
+    params: Attributes,
+    children: Child*
+  ): VNode = js.native
 
-  def h(node: FunctionComponent,
-        params: Attributes,
-        children: Child*): VNode = js.native
+  def h(
+    node: FunctionComponent,
+    params: Attributes,
+    children: Child*
+  ): VNode = js.native
 
-  def h(node: PropsFunctionComponent,
-        params: Attributes,
-        children: Child*): VNode = js.native
+  def h(
+    node: PropsFunctionComponent,
+    params: Attributes,
+    children: Child*
+  ): VNode = js.native
 
-  def h(node: String,
-        params: Attributes,
-        children: Child*): VNode = js.native
+  def h(
+    node: String,
+    params: Attributes,
+    children: Child*
+  ): VNode = js.native
+
+  def h(
+    node: js.Dynamic,
+    params: Attributes
+  ): VNode = js.native
+
+  def h(
+    node: FunctionComponent,
+    params: Attributes
+  ): VNode = js.native
+
+  def h(
+    node: PropsFunctionComponent,
+    params: Attributes
+  ): VNode = js.native
+
+  def h(
+    node: String,
+    params: Attributes
+  ): VNode = js.native
 
   def render(node: VNode, parent: dom.Element): dom.Element = js.native
   def render(node: VNode, parent: dom.Element, mergeWith: dom.Element): dom.Element = js.native
