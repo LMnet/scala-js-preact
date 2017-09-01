@@ -134,7 +134,7 @@ class SomeComponent {
 
 Here is the list of other `Component` methods:
 * `props` - gives access to the read-only `props` object.
-* `props` - state access to the read-only `state` object.
+* `state` - gives access to the read-only `state` object.
 * `setState` - method to define a new state of the component. This is the only way to set up a new state.
 * `initialState` - if you want to define the initial state of the component, you should do this with this method.
 This method could be called only once.
