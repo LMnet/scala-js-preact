@@ -40,7 +40,6 @@ private[preact] object PreactComponentImpl {
   private val Child = t"_root_.preact.Preact.Child"
   private val Attributes = t"_root_.preact.Preact.raw.Attributes"
   private val h = q"_root_.preact.Preact.raw.h"
-  private val ScalaJSDefined = mod"@_root_.scala.scalajs.js.annotation.ScalaJSDefined"
 
   type PropsTerm = Either[Unit, Term.Param]
 
@@ -68,18 +67,14 @@ private[preact] object PreactComponentImpl {
         val applyMethods = createApplyMethods(cls.name, params.propsType, params.withChildrenValue, Some(companion))
         val templateStats: Seq[Stat] = companion.templ.stats.getOrElse(Nil) ++ applyMethods
         val newCompanion = companion.copy(templ = companion.templ.copy(stats = Some(templateStats)))
-        val newClass = addScalaJsDefinedAnnotation(
-          addBaseClass(cls, params.propsType, params.stateType)
-        )
+        val newClass = addBaseClass(cls, params.propsType, params.stateType)
         Term.Block(Seq(newClass, newCompanion))
 
       case None =>
         checkCtorProps(cls.ctor.paramss, params.propsType)
         val applyMethods = createApplyMethods(cls.name, params.propsType, params.withChildrenValue, None)
         val companion = q"object ${Term.Name(cls.name.value)} { ..$applyMethods }"
-        val newClass = addScalaJsDefinedAnnotation(
-          addBaseClass(cls, params.propsType, params.stateType)
-        )
+        val newClass = addBaseClass(cls, params.propsType, params.stateType)
         Term.Block(Seq(newClass, companion))
     }
   }
@@ -186,10 +181,6 @@ private[preact] object PreactComponentImpl {
     val componentBaseClass = ctor"_root_.preact.Preact.Component[${propsType.originalType}, ${stateType.originalType}]"
     val newParents = cls.templ.parents :+ componentBaseClass
     cls.copy(templ = cls.templ.copy(parents = newParents))
-  }
-
-  def addScalaJsDefinedAnnotation(cls: Defn.Class): Defn.Class = {
-    cls.copy(mods = cls.mods :+ ScalaJSDefined)
   }
 }
 

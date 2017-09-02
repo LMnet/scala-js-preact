@@ -1,12 +1,12 @@
 package preact
 
+import com.github.ghik.silencer.silent
 import org.scalajs.dom
 import preact.Preact.VNode
-import com.github.ghik.silencer.silent
-import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSName, ScalaJSDefined}
 
-@ScalaJSDefined
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSName
+
 private[preact] abstract class Component[Props, State] extends Preact.raw.Component {
 
   @JSName("sProps")

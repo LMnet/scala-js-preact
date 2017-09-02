@@ -3,12 +3,13 @@ package example
 import org.scalajs.dom
 import preact.Preact
 
-import scala.scalajs.js.JSApp
+import scala.scalajs.js.annotation.JSExportTopLevel
 
-object Main extends JSApp {
+object Main {
 
   import preact.dsl.symbol._
 
+  @JSExportTopLevel("example.Main.main")
   def main(): Unit = {
     val root = dom.document.getElementById("scala")
 

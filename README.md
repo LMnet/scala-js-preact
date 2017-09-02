@@ -15,7 +15,8 @@ libraryDependencies ++= Seq(
   "com.github.lmnet" %%% "scala-js-preact-core" % "0.2.0",
   "com.github.lmnet" %%% "scala-js-preact-dsl-tags" % "0.2.0"
 )
-addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M9" cross CrossVersion.full)
+addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full)
+scalacOptions += "-P:scalajs:sjsDefinedByDefault"
 ```
 
 Now you can create Preact component:
@@ -49,10 +50,11 @@ And render it:
 import org.scalajs.dom
 import preact.Preact
 
-import scala.scalajs.js.JSApp
+import scala.scalajs.js.annotation.JSExportTopLevel
 
-object App extends JSApp {
+object App {
 
+  @JSExportTopLevel("App.main")
   def main(): Unit = {
     val appDiv = dom.document.getElementById("app")
     val component = SomeComponent(name = "scala-js-preact user")
@@ -99,6 +101,17 @@ Inspired by [scalatags](https://github.com/lihaoyi/scalatags).
 
 Usage
 -----
+
+### Scala.js configuration
+
+To use `scala-js-preact` you should add this line into your build.sbt file:
+
+```scala
+scalacOptions += "-P:scalajs:sjsDefinedByDefault"
+```
+You can read more about this scalac option [here](https://www.scala-js.org/news/2017/09/01/announcing-scalajs-0.6.20/).
+
+This requirement is temporary: after release Scala.js 1.0 this option will be always enabled without explicit configuration.
 
 ### Components
 
@@ -223,7 +236,7 @@ nice compile-time error.
 
 ### DSL
 
-`scala-js-preact` got two optional DSLs: symbol DSL and tags DSL. You can use any of them, or any third party DSL,
+`scala-js-preact` got two optional DSLs out of the box: symbol DSL and tags DSL. You can use any of them, or any third party DSL,
 or even create your own DSL. In the sections below you will be guided how to use default DSLs and create your own.
 
 #### Symbol DSL
