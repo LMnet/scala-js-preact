@@ -6,20 +6,17 @@ import org.scalatest.{AsyncFreeSpec, BeforeAndAfterEach}
 import preact.raw.RawPreact._
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.ScalaJSDefined
 
 object PreactRawFacadeTest {
 
   var dynVar: js.Dynamic = null
 
-  @ScalaJSDefined
   class SimpleComponent extends Component {
     def render(): VNode = {
       h("div", null, "test")
     }
   }
 
-  @ScalaJSDefined
   class PropsComponent extends Component {
     def render(): VNode = {
       dynVar = jsProps
@@ -27,7 +24,6 @@ object PreactRawFacadeTest {
     }
   }
 
-  @ScalaJSDefined
   class ChildrenComponent extends Component {
     def render(): VNode = {
       val children = jsProps.children.asInstanceOf[js.Array[Child]]
@@ -35,7 +31,6 @@ object PreactRawFacadeTest {
     }
   }
 
-  @ScalaJSDefined
   class PropsChildrenComponent extends Component {
     def render(): VNode = {
       val children = jsProps.children.asInstanceOf[js.Array[Child]]
@@ -43,7 +38,6 @@ object PreactRawFacadeTest {
     }
   }
 
-  @ScalaJSDefined
   class StateComponent extends Component {
 
     jsState = js.Dynamic.literal(foo = 1, bar = "lol")
@@ -54,7 +48,6 @@ object PreactRawFacadeTest {
     }
   }
 
-  @ScalaJSDefined
   class SetStateComponent extends Component {
 
     jsState = js.Dynamic.literal(foo = 1)
@@ -72,7 +65,6 @@ object PreactRawFacadeTest {
     }
   }
 
-  @ScalaJSDefined
   class EventComponent extends Component {
     def render(): VNode = {
       dynVar = jsBase.asInstanceOf[js.Dynamic]

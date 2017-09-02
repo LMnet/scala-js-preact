@@ -1,4 +1,4 @@
-val scalaVer = "2.12.2"
+val scalaVer = "2.12.3"
 
 cancelable in Global := true
 
@@ -46,14 +46,15 @@ val commonSettings = Seq(
     "-Ywarn-unused",
     "-Ywarn-unused-import",
     "-Ywarn-numeric-widen",
-    "-Xlint:missing-interpolator"
+    "-Xlint:missing-interpolator",
+    "-P:scalajs:sjsDefinedByDefault"
   ),
   jsEnv in Test := PhantomJSEnv().value,
   publishArtifact := false
 )
 
 val withMacroParadise = Seq(
-  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M9" cross CrossVersion.full)
+  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full)
 )
 
 val lodashJsTestDep = "org.webjars.npm" % "lodash" % "4.17.3" / s"4.17.3/lodash.js" % "test"
@@ -72,7 +73,7 @@ lazy val raw = project
       scalatestTestDep.value
     ),
     jsDependencies ++= Seq(
-      "org.webjars.npm" % "preact" % "8.2.1" / "dist/preact.min.js",
+      "org.webjars.npm" % "preact" % "8.2.5" / "dist/preact.min.js",
       lodashJsTestDep
     )
   )

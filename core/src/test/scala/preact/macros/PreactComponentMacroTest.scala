@@ -32,7 +32,6 @@ class PreactComponentMacroTest extends FreeSpec {
               )
 
               val expected = q"""
-                @_root_.scala.scalajs.js.annotation.ScalaJSDefined
                 class Test extends _root_.preact.Preact.Component[Unit, Unit] {
                   def render() = Preact.raw.h("div",null, null)
                 }
@@ -63,7 +62,6 @@ class PreactComponentMacroTest extends FreeSpec {
               )
 
               val expected = q"""
-                @_root_.scala.scalajs.js.annotation.ScalaJSDefined
                 class Test extends _root_.preact.Preact.Component[Unit, Unit] {
                   def render() = Preact.raw.h("div",null, children)
                 }
@@ -99,7 +97,6 @@ class PreactComponentMacroTest extends FreeSpec {
             )
 
             val expected = q"""
-              @_root_.scala.scalajs.js.annotation.ScalaJSDefined
               class Test extends _root_.preact.Preact.Component[Unit, State] {
                 def render() = Preact.raw.h("div",null, null)
               }
@@ -132,7 +129,6 @@ class PreactComponentMacroTest extends FreeSpec {
                 )
 
                 val expected = q"""
-                  @_root_.scala.scalajs.js.annotation.ScalaJSDefined
                   class Test extends _root_.preact.Preact.Component[Props, Unit] {
                     def render() = Preact.raw.h("div",null, null)
                   }
@@ -164,7 +160,6 @@ class PreactComponentMacroTest extends FreeSpec {
                 )
 
                 val expected = q"""
-                  @_root_.scala.scalajs.js.annotation.ScalaJSDefined
                   class Test extends _root_.preact.Preact.Component[Props, Unit] {
                     def render() = Preact.raw.h("div",null, children)
                   }
@@ -204,7 +199,6 @@ class PreactComponentMacroTest extends FreeSpec {
               )
 
               val expected = q"""
-                @_root_.scala.scalajs.js.annotation.ScalaJSDefined
                 class Test extends _root_.preact.Preact.Component[Props, State] {
                   def render() = Preact.raw.h("div",null, null)
                 }
@@ -244,7 +238,6 @@ class PreactComponentMacroTest extends FreeSpec {
             )
 
             val expected = q"""
-              @_root_.scala.scalajs.js.annotation.ScalaJSDefined
               class Test extends _root_.preact.Preact.Component[Props, Unit] {
                 def render() = Preact.raw.h("div",null, null)
               }
@@ -287,7 +280,6 @@ class PreactComponentMacroTest extends FreeSpec {
             )
 
             val expected = q"""
-              @_root_.scala.scalajs.js.annotation.ScalaJSDefined
               class Test extends _root_.preact.Preact.Component[Props, Unit] {
                 def render() = Preact.raw.h("div",null, children)
               }
@@ -342,7 +334,6 @@ class PreactComponentMacroTest extends FreeSpec {
             )
 
             val expected = q"""
-              @_root_.scala.scalajs.js.annotation.ScalaJSDefined
               class Test extends _root_.preact.Preact.Component[Test.Props, Unit] {
                 def render() = Preact.raw.h("div",null, null)
               }
@@ -383,7 +374,6 @@ class PreactComponentMacroTest extends FreeSpec {
         )
 
         val expected = q"""
-          @_root_.scala.scalajs.js.annotation.ScalaJSDefined
           class Test(initialProps: Props) extends _root_.preact.Preact.Component[Props, Unit] {
             def render() = Preact.raw.h("div",null, null)
           }
