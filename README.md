@@ -12,8 +12,8 @@ Add the following lines into your `build.sbt` file:
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.github.lmnet" %%% "scala-js-preact-core" % "0.2.0",
-  "com.github.lmnet" %%% "scala-js-preact-dsl-tags" % "0.2.0"
+  "com.github.lmnet" %%% "scala-js-preact-core" % "0.2.1",
+  "com.github.lmnet" %%% "scala-js-preact-dsl-tags" % "0.2.1"
 )
 addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full)
 scalacOptions += "-P:scalajs:sjsDefinedByDefault"
@@ -247,7 +247,7 @@ All under your control and responsibility.
 
 To use this DSL add it to your dependencies:
 ```scala
-"com.github.lmnet" %%% "scala-js-preact-dsl-symbol" % "0.2.0"
+"com.github.lmnet" %%% "scala-js-preact-dsl-symbol" % "0.2.1"
 ```
 
 And import `preact.dsl.symbol._` into your source code:
@@ -312,7 +312,7 @@ But if you want you can create `scalatags` backend for the `scala-js-preact`. Co
 
 To use this DSL add it to your dependencies:
 ```scala
-"com.github.lmnet" %%% "scala-js-preact-dsl-tags" % "0.2.0"
+"com.github.lmnet" %%% "scala-js-preact-dsl-tags" % "0.2.1"
 ```
 
 And import `preact.dsl.tags._` into your source code:
