@@ -21,7 +21,7 @@ object Entry {
 class Tag(val name: String) {
 
   def apply(): Preact.VNode = {
-    Preact.raw.h(name, null, null)
+    Preact.raw.h(name, null)
   }
 
   def apply(entries: Entry*): Preact.VNode = {
@@ -44,7 +44,7 @@ class Tag(val name: String) {
 
           case Entry.EmptyChild =>
             // https://github.com/developit/preact/issues/540
-            (acc._1, acc._2 ++ null)
+            (acc._1, acc._2 :+ null)
         }
       }
     val vnodeAttributes = if (attributes.isEmpty) null else attributes

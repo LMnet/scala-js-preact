@@ -20,25 +20,25 @@ class TagsDslTest extends FreeSpec {
         "when apply" - {
           "receives empty argument list" in {
             val node = div()
-            val expected = h("div", null, null)
+            val expected = h("div", null)
             assert(isEqual(node, expected))
           }
 
           "receives another symbol" in {
             val node = div(p())
-            val expected = h("div", null, h("p", null, null))
+            val expected = h("div", null, h("p", null))
             assert(isEqual(node, expected))
           }
 
           "receives multiple symbols" in {
             val node = div(p(), b())
-            val expected = h("div", null, h("p", null, null), h("b", null, null))
+            val expected = h("div", null, h("p", null), h("b", null))
             assert(isEqual(node, expected))
           }
 
           "receives multiple symbols as Iterable" in {
             val node = div(Seq(p(), b()))
-            val expected = h("div", null, h("p", null, null), h("b", null, null))
+            val expected = h("div", null, h("p", null), h("b", null))
             assert(isEqual(node, expected))
           }
 
@@ -50,7 +50,7 @@ class TagsDslTest extends FreeSpec {
           }
 
           "receives multiple vnodes as Iterable" in {
-            val vnodes = Seq(h("p", null, null), h("b", null, null))
+            val vnodes = Seq(h("p", null), h("b", null))
             val node = div(vnodes)
             val expected = h("div", null, vnodes(0), vnodes(1))
             assert(isEqual(node, expected))
@@ -59,6 +59,12 @@ class TagsDslTest extends FreeSpec {
           "receives string" in {
             val node = div("test")
             val expected = h("div", null, "test")
+            assert(isEqual(node, expected))
+          }
+
+          "receives EmptyChild" in {
+            val node = div(Entry.EmptyChild)
+            val expected = h("div", null, null)
             assert(isEqual(node, expected))
           }
         }
