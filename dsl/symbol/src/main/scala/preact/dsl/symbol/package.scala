@@ -9,7 +9,7 @@ package object symbol extends EntryImplicits {
   implicit class SymbolOps(val self: Symbol) extends AnyVal {
 
     def apply(): Preact.VNode = {
-      Preact.raw.h(self.name, null, null)
+      Preact.raw.h(self.name, null)
     }
 
     def apply(entries: Entry*): Preact.VNode = {
@@ -32,7 +32,7 @@ package object symbol extends EntryImplicits {
 
             case Entry.EmptyChild =>
               // https://github.com/developit/preact/issues/540
-              (acc._1, acc._2 ++ null)
+              (acc._1, acc._2 :+ null)
           }
         }
       val vnodeAttributes = if (attributes.isEmpty) null else attributes
