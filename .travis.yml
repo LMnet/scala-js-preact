@@ -7,13 +7,26 @@ scala:
 jdk:
   - oraclejdk8
 
-# Use PhantomJS 2
-# https://mediocre.com/forum/topics/phantomjs-2-and-travis-ci-we-beat-our-heads-against-a-wall-so-you-dont-have-to
+addons:
+  chrome: stable
+
+env:
+  global:
+    - TRAVIS_NODE_VERSION="6"
+before_install:
+  # Install Node.js and yarn.
+  - nvm install $TRAVIS_NODE_VERSION
+  - nvm use $TRAVIS_NODE_VERSION
+
 install:
+  # Use PhantomJS 2
+  # https://mediocre.com/forum/topics/phantomjs-2-and-travis-ci-we-beat-our-heads-against-a-wall-so-you-dont-have-to
   - mkdir travis-phantomjs
   - wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 -O "$PWD"/travis-phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2
   - tar -xvf "$PWD"/travis-phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C "$PWD"/travis-phantomjs
   - export PATH="$PWD/travis-phantomjs:$PATH"
+  # Installing dependencies to run selenium tests
+  - npm install -g todomvc-test http-server
 
 # Taken from https://github.com/typelevel/cats/blob/master/.travis.yml
 before_cache:
@@ -26,5 +39,18 @@ cache:
     - $HOME/.sbt/launchers
     - $HOME/.ivy2/cache
 
+
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+  - nohup http-server ./examples/todomvc/ &
+
 script:
   - sbt ++$TRAVIS_SCALA_VERSION "set scalacOptions in ThisBuild += \"-Xfatal-warnings"\" test
+  - sbt ++$TRAVIS_SCALA_VERSION "set scalacOptions in ThisBuild += \"-Xfatal-warnings"\" fastOptJS
+  - google-chrome-stable --version
+  - todomvc-test http://localhost:8080
+
+after_script:
+  - killall node
