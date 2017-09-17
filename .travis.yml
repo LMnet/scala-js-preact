@@ -47,7 +47,6 @@ before_script:
 script:
   - sbt ++$TRAVIS_SCALA_VERSION "set scalacOptions in ThisBuild += \"-Xfatal-warnings"\" test
   - sbt ++$TRAVIS_SCALA_VERSION "set scalacOptions in ThisBuild += \"-Xfatal-warnings"\" fastOptJS
-  - google-chrome-stable --version
   - todomvc-test http://localhost:8080
 
 after_script:
