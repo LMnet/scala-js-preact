@@ -1,4 +1,4 @@
-val scalaVer = "2.12.3"
+val scalaVer = "2.12.4"
 
 cancelable in Global := true
 
@@ -58,8 +58,8 @@ val withMacroParadise = Seq(
 )
 
 val lodashJsTestDep = "org.webjars.npm" % "lodash" % "4.17.3" / s"4.17.3/lodash.js" % "test"
-val scalajsDomDep = Def.setting("org.scala-js" %%% "scalajs-dom" % "0.9.1")
-val scalatestTestDep = Def.setting("org.scalatest" %%% "scalatest" % "3.0.1" % "test")
+val scalajsDomDep = Def.setting("org.scala-js" %%% "scalajs-dom" % "0.9.2")
+val scalatestTestDep = Def.setting("org.scalatest" %%% "scalatest" % "3.0.4" % "test")
 
 lazy val raw = project
   .enablePlugins(ScalaJSPlugin)
@@ -73,7 +73,7 @@ lazy val raw = project
       scalatestTestDep.value
     ),
     jsDependencies ++= Seq(
-      "org.webjars.npm" % "preact" % "8.2.5" / "dist/preact.min.js",
+      "org.webjars.npm" % "preact" % "8.2.5" / "dist/preact.min.js", // TODO: 8.2.6
       lodashJsTestDep
     )
   )
