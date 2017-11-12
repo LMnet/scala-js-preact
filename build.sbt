@@ -1,4 +1,4 @@
-val scalaVer = "2.12.4"
+val scalaVer = "2.12.3" // TODO: 2.12.4 after fixing warnings
 
 cancelable in Global := true
 
