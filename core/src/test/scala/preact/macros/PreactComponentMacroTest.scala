@@ -9,7 +9,7 @@ class PreactComponentMacroTest extends FreeSpec {
 
   import PreactComponentImpl._
 
-  val simpleUnitType = SimpleType(Left(t"Unit"))
+  val unitType = t"Unit"
 
   "PreactComponent macro annotation" - {
     "should correctly expand" - {
@@ -25,8 +25,8 @@ class PreactComponentMacroTest extends FreeSpec {
                 """,
                 companionOpt = None,
                 Params(
-                  propsType = simpleUnitType,
-                  stateType = simpleUnitType,
+                  propsType = unitType,
+                  stateType = unitType,
                   withChildrenValue = false
                 )
               )
@@ -55,8 +55,8 @@ class PreactComponentMacroTest extends FreeSpec {
                 """,
                 companionOpt = None,
                 Params(
-                  propsType = simpleUnitType,
-                  stateType = simpleUnitType,
+                  propsType = unitType,
+                  stateType = unitType,
                   withChildrenValue = true
                 )
               )
@@ -90,14 +90,43 @@ class PreactComponentMacroTest extends FreeSpec {
               """,
               companionOpt = None,
               Params(
-                propsType = simpleUnitType,
-                stateType = SimpleType(Left(t"State")),
+                propsType = unitType,
+                stateType = t"State",
                 withChildrenValue = false
               )
             )
 
             val expected = q"""
               class Test extends _root_.preact.Preact.Component[Unit, State] {
+                def render() = Preact.raw.h("div",null, null)
+              }
+              object Test {
+                def apply()(
+                  implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                ): _root_.preact.Preact.VNode = {
+                  _root_.preact.Preact.raw.h(ct.constructor, null, null)
+                }
+              }
+            """
+            assertStructurallyEqual(actual, expected)
+          }
+          "and State is a generic type" in {
+            val actual = expand(
+              cls = q"""
+                class Test {
+                  def render() = Preact.raw.h("div", null, null)
+                }
+              """,
+              companionOpt = None,
+              Params(
+                propsType = unitType,
+                stateType = t"Option[Int]",
+                withChildrenValue = false
+              )
+            )
+
+            val expected = q"""
+              class Test extends _root_.preact.Preact.Component[Unit, Option[Int]] {
                 def render() = Preact.raw.h("div",null, null)
               }
               object Test {
@@ -122,8 +151,8 @@ class PreactComponentMacroTest extends FreeSpec {
                   """,
                   companionOpt = None,
                   Params(
-                    propsType = SimpleType(Left(t"Props")),
-                    stateType = simpleUnitType,
+                    propsType = t"Props",
+                    stateType = unitType,
                     withChildrenValue = false
                   )
                 )
@@ -153,8 +182,8 @@ class PreactComponentMacroTest extends FreeSpec {
                   """,
                   companionOpt = None,
                   Params(
-                    propsType = SimpleType(Left(t"Props")),
-                    stateType = simpleUnitType,
+                    propsType = t"Props",
+                    stateType = unitType,
                     withChildrenValue = true
                   )
                 )
@@ -192,14 +221,45 @@ class PreactComponentMacroTest extends FreeSpec {
                 """,
                 companionOpt = None,
                 Params(
-                  propsType = SimpleType(Left(t"Props")),
-                  stateType = SimpleType(Left(t"State")),
+                  propsType = t"Props",
+                  stateType = t"State",
                   withChildrenValue = false
                 )
               )
 
               val expected = q"""
                 class Test extends _root_.preact.Preact.Component[Props, State] {
+                  def render() = Preact.raw.h("div",null, null)
+                }
+                object Test {
+                  def apply(props: Props)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], null
+                    )
+                  }
+                }
+              """
+              assertStructurallyEqual(actual, expected)
+            }
+            "and State is a generic type" in {
+              val actual = expand(
+                cls =q"""
+                  class Test {
+                    def render() = Preact.raw.h("div", null, null)
+                  }
+                """,
+                companionOpt = None,
+                Params(
+                  propsType = t"Props",
+                  stateType = t"Option[Int]",
+                  withChildrenValue = false
+                )
+              )
+
+              val expected = q"""
+                class Test extends _root_.preact.Preact.Component[Props, Option[Int]] {
                   def render() = Preact.raw.h("div",null, null)
                 }
                 object Test {
@@ -231,8 +291,8 @@ class PreactComponentMacroTest extends FreeSpec {
                 }
               """),
               Params(
-                propsType = SimpleType(Left(t"Props")),
-                stateType = simpleUnitType,
+                propsType = t"Props",
+                stateType = unitType,
                 withChildrenValue = false
               )
             )
@@ -273,8 +333,8 @@ class PreactComponentMacroTest extends FreeSpec {
                 }
               """),
               Params(
-                propsType = SimpleType(Left(t"Props")),
-                stateType = simpleUnitType,
+                propsType = t"Props",
+                stateType = unitType,
                 withChildrenValue = true
               )
             )
@@ -327,8 +387,8 @@ class PreactComponentMacroTest extends FreeSpec {
                 }
               """),
               Params(
-                propsType = SimpleType(Right(t"Test.Props")),
-                stateType = simpleUnitType,
+                propsType = t"Test.Props",
+                stateType = unitType,
                 withChildrenValue = false
               )
             )
@@ -340,7 +400,7 @@ class PreactComponentMacroTest extends FreeSpec {
               object Test {
                 case class Props(a: String, b: Int)
 
-                def apply(props: Props)(
+                def apply(props: Test.Props)(
                   implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
                 ): _root_.preact.Preact.VNode = {
                   _root_.preact.Preact.raw.h(
@@ -367,8 +427,8 @@ class PreactComponentMacroTest extends FreeSpec {
           """,
           companionOpt = None,
           Params(
-            propsType = SimpleType(Left(t"Props")),
-            stateType = simpleUnitType,
+            propsType = t"Props",
+            stateType = unitType,
             withChildrenValue = false
           )
         )
@@ -399,8 +459,8 @@ class PreactComponentMacroTest extends FreeSpec {
             """,
             companionOpt = None,
             Params(
-              propsType = SimpleType(Left(t"Props")),
-              stateType = simpleUnitType,
+              propsType = t"Props",
+              stateType = unitType,
               withChildrenValue = false
             )
           )
@@ -414,18 +474,18 @@ class PreactComponentMacroTest extends FreeSpec {
       "when State and Props types is defined as 'Unit'" - {
         "and no parameters is passed to the constructor" in {
           val actual = extractAnnotationParams(q"new PreactComponent[Unit, Unit]()")
-          val expected = Params(simpleUnitType, simpleUnitType, withChildrenValue = false)
+          val expected = Params(unitType, unitType, withChildrenValue = false)
           assertParams(actual, expected)
         }
         "and withChildren is passed to the constructor" - {
           "with argument name" in {
             val actual = extractAnnotationParams(q"new PreactComponent[Unit, Unit](withChildren = true)")
-            val expected = Params(simpleUnitType, simpleUnitType, withChildrenValue = true)
+            val expected = Params(unitType, unitType, withChildrenValue = true)
             assertParams(actual, expected)
           }
           "without argument name" in {
             val actual = extractAnnotationParams(q"new PreactComponent[Unit, Unit](true)")
-            val expected = Params(simpleUnitType, simpleUnitType, withChildrenValue = true)
+            val expected = Params(unitType, unitType, withChildrenValue = true)
             assertParams(actual, expected)
           }
         }
@@ -433,24 +493,24 @@ class PreactComponentMacroTest extends FreeSpec {
       "when State type is defined as" - {
         "'State'" in {
           val actual = extractAnnotationParams(q"new PreactComponent[Unit, State]()")
-          val expected = Params(simpleUnitType, SimpleType(Left(t"State")), withChildrenValue = false)
+          val expected = Params(unitType, t"State", withChildrenValue = false)
           assertParams(actual, expected)
         }
         "'Foo.State'" in {
           val actual = extractAnnotationParams(q"new PreactComponent[Unit, Foo.State]()")
-          val expected = Params(simpleUnitType, SimpleType(Right(t"Foo.State")), withChildrenValue = false)
+          val expected = Params(unitType, t"Foo.State", withChildrenValue = false)
           assertParams(actual, expected)
         }
       }
       "when State type is defined as" - {
         "'Props'" in {
           val actual = extractAnnotationParams(q"new PreactComponent[Props, Unit]()")
-          val expected = Params(SimpleType(Left(t"Props")), simpleUnitType, withChildrenValue = false)
+          val expected = Params(t"Props", unitType, withChildrenValue = false)
           assertParams(actual, expected)
         }
         "'Foo.Props'" in {
           val actual = extractAnnotationParams(q"new PreactComponent[Foo.Props, Unit]()")
-          val expected = Params(SimpleType(Right(t"Foo.Props")), simpleUnitType, withChildrenValue = false)
+          val expected = Params(t"Foo.Props", unitType, withChildrenValue = false)
           assertParams(actual, expected)
         }
       }
@@ -458,8 +518,8 @@ class PreactComponentMacroTest extends FreeSpec {
   }
 
   private def assertParams(actual: Params, expected: Params): Assertion = {
-    assertStructurallyEqual(actual.propsType.originalType, expected.propsType.originalType)
-    assertStructurallyEqual(actual.stateType.originalType, expected.stateType.originalType)
+    assertStructurallyEqual(actual.propsType, expected.propsType)
+    assertStructurallyEqual(actual.stateType, expected.stateType)
     assert(actual.withChildrenValue == expected.withChildrenValue)
   }
 }
