@@ -8,32 +8,7 @@ import scala.meta._
 
 private[preact] object PreactComponentImpl {
 
-  case class SimpleType(tpe: Either[Type.Name, Type.Select]) {
-
-    val originalType: Type.Ref = tpe match {
-      case Left(x) => x
-      case Right(x) => x
-    }
-
-    val typeName: Type.Name = tpe match {
-      case Left(name) => name
-      case Right(Type.Select(_, name)) => name
-    }
-
-    def isUnit: Boolean = typeName.structure == t"Unit".structure
-  }
-  object SimpleType {
-
-    def unapply(tpe: Type.Arg): Option[SimpleType] = {
-      tpe match {
-        case x: Type.Name => Some(SimpleType(Left(x)))
-        case x: Type.Select => Some(SimpleType(Right(x)))
-        case _ => None
-      }
-    }
-  }
-
-  case class Params(propsType: SimpleType, stateType: SimpleType, withChildrenValue: Boolean)
+  case class Params(propsType: Type, stateType: Type, withChildrenValue: Boolean)
 
   private val ConstructorTag = t"_root_.scala.scalajs.js.ConstructorTag"
   private val VNode = t"_root_.preact.Preact.VNode"
@@ -41,15 +16,15 @@ private[preact] object PreactComponentImpl {
   private val Attributes = t"_root_.preact.Preact.raw.Attributes"
   private val h = q"_root_.preact.Preact.raw.h"
 
-  type PropsTerm = Either[Unit, Term.Param]
+  private def isUnit(tpe: Type): Boolean = tpe.structure == t"Unit".structure
 
   def extractAnnotationParams(annotation: Stat): Params = {
     annotation match {
-      case q"new $_[${SimpleType(propsTpe)}, ${SimpleType(stateTpe)}](${Lit.Boolean(value)})" =>
+      case q"new $_[$propsTpe, $stateTpe](${Lit.Boolean(value)})" =>
         Params(propsTpe, stateTpe, value)
-      case q"new $_[${SimpleType(propsTpe)}, ${SimpleType(stateTpe)}](withChildren = ${Lit.Boolean(value)})" =>
+      case q"new $_[$propsTpe, $stateTpe](withChildren = ${Lit.Boolean(value)})" =>
         Params(propsTpe, stateTpe, value)
-      case q"new $_[${SimpleType(propsTpe)}, ${SimpleType(stateTpe)}]()" =>
+      case q"new $_[$propsTpe, $stateTpe]()" =>
         Params(propsTpe, stateTpe, withChildrenValue = false)
       case _  =>
         abort("PreactComponent annotation application is invalid")
@@ -79,7 +54,7 @@ private[preact] object PreactComponentImpl {
     }
   }
 
-  def checkCtorProps(paramss: Seq[Seq[Term.Param]], annotationPropsType: SimpleType): Unit = {
+  def checkCtorProps(paramss: Seq[Seq[Term.Param]], annotationPropsType: Type): Unit = {
     // TODO: validation monad?
     paramss match {
       case Seq(Seq(Term.Param(_, name, _, _))) =>
@@ -89,10 +64,10 @@ private[preact] object PreactComponentImpl {
             "If you want to access props in the class constructor you should rename constructor argument, " +
             "for example to 'initialProps'.")
         } else ()
-      case Seq(Seq(Term.Param(_, _, Some(SimpleType(tpe)), _)))
-        if tpe.originalType.structure != annotationPropsType.originalType.structure =>
+      case Seq(Seq(Term.Param(_, _, Some(tpe), _)))
+        if tpe.structure != annotationPropsType.structure =>
         abort("Props types in the annotation parameters and in the component's constructor didn't match.")
-      case x if x.length > 1 =>
+      case x if x.lengthCompare(1) > 0 =>
         abort("Component can have only one constructor argument - initial props.")
       case x if x.isEmpty =>
         ()
@@ -103,12 +78,12 @@ private[preact] object PreactComponentImpl {
 
   def createApplyMethods(
     name: Type.Name,
-    propsType: SimpleType,
+    propsType: Type,
     withChildren: Boolean,
     companionOpt: Option[Defn.Object]
   ): Seq[Defn] = {
     def commonApply(): Seq[Defn] = {
-      if (propsType.isUnit) {
+      if (isUnit(propsType)) {
         Seq(
           q"""def apply()(implicit ct: $ConstructorTag[$name]): $VNode = {
               $h(ct.constructor, null, null)
@@ -122,13 +97,13 @@ private[preact] object PreactComponentImpl {
         } else Nil)
       } else {
         Seq(
-          q"""def apply(props: ${propsType.typeName})(implicit ct: $ConstructorTag[$name]): $VNode = {
+          q"""def apply(props: $propsType)(implicit ct: $ConstructorTag[$name]): $VNode = {
             $h(ct.constructor, props.asInstanceOf[$Attributes], null)
           }"""
         ) ++ (if (withChildren) {
           Seq(
             q"""def apply(
-              props: ${propsType.typeName}, children: $Child*)(implicit ct: $ConstructorTag[$name]
+              props: $propsType, children: $Child*)(implicit ct: $ConstructorTag[$name]
             ): $VNode = {
               $h(ct.constructor, props.asInstanceOf[$Attributes], children: _*)
             }"""
@@ -143,7 +118,13 @@ private[preact] object PreactComponentImpl {
       * this method return convenient `apply($ctor)` in the companion.
       */
     def propsApply(): Seq[Defn] = {
-      val propsClassNameOpt: Option[Type.Name] = if (propsType.isUnit) None else Some(propsType.typeName)
+      val propsClassNameOpt: Option[Type.Name] = if (isUnit(propsType)) None else {
+        propsType match {
+          case Type.Select(_, x) => Some(x)
+          case x: Type.Name => Some(x)
+          case _ => None
+        }
+      }
 
       val result: Option[Option[Seq[Defn.Def]]] = for {
         propsClassName <- propsClassNameOpt
@@ -177,8 +158,8 @@ private[preact] object PreactComponentImpl {
     commonApply() ++ propsApply()
   }
 
-  def addBaseClass(cls: Defn.Class, propsType: SimpleType, stateType: SimpleType): Defn.Class = {
-    val componentBaseClass = ctor"_root_.preact.Preact.Component[${propsType.originalType}, ${stateType.originalType}]"
+  def addBaseClass(cls: Defn.Class, propsType: Type, stateType: Type): Defn.Class = {
+    val componentBaseClass = ctor"_root_.preact.Preact.Component[$propsType, $stateType]"
     val newParents = cls.templ.parents :+ componentBaseClass
     cls.copy(templ = cls.templ.copy(parents = newParents))
   }
