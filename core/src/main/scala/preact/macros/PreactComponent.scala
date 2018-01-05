@@ -133,21 +133,63 @@ private[preact] object PreactComponentImpl {
       } yield {
         stats.collectFirst {
           // companion contains correct Props class of type `$tpe` in the body
-          case q"case class $tpe(..$ctor)" if tpe.structure == propsClassName.structure =>
-            val ctorCall = ctor.map { param =>
-              Term.Name(param.name.value)
+          case q"case class $tpe(...$ctor)" if tpe.structure == propsClassName.structure =>
+            val ctorCall = ctor.map { params =>
+              params.map { param =>
+                Term.Name(param.name.value)
+              }
             }
+            val isCtorHasImplicits = (for {
+              last <- ctor.lastOption
+              head <- last.headOption
+            } yield head.mods.exists(_.is[Mod.Implicit])).contains(true)
+
+            val ctorTagParam = param"implicit ct: $ConstructorTag[$name]"
+
             val propsClassNameTerm = Term.Name(tpe.value)
+
+            val commonApply = if (isCtorHasImplicits) {
+              ctor.init ++ Seq(ctor.last :+ ctorTagParam)
+            } else {
+              ctor ++ Seq(Seq(ctorTagParam))
+            }
             Seq(
-              q"""def apply(..$ctor)(implicit ct: $ConstructorTag[$name]): $VNode = {
-                apply($propsClassNameTerm(..$ctorCall))
+              q"""def apply(...$commonApply): $VNode = {
+                apply($propsClassNameTerm(...$ctorCall))
               }"""
             ) ++ (if (withChildren) {
-              Seq(
-                q"""def apply(..$ctor, children: $Child*)(implicit ct: $ConstructorTag[$name]): $VNode = {
-                  apply($propsClassNameTerm(..$ctorCall), children: _*)
-                }"""
-              )
+              def emptyPropsConstructorError = abort("Props constructor should have at least one argument")
+              val childrenParam = param"children: $Child*"
+              ctor match {
+                case Seq(paramsList) =>
+                  Seq(
+                    q"""def apply(..$paramsList, $childrenParam)($ctorTagParam): $VNode = {
+                      apply($propsClassNameTerm(...$ctorCall), children: _*)
+                    }"""
+                  )
+                case Seq() =>
+                  emptyPropsConstructorError
+                case _ =>
+                  val apply = if (isCtorHasImplicits) {
+                    val ctorWithoutImplicits = ctor.init
+                    val implicitParams = ctor.last
+                    ctorWithoutImplicits match {
+                      case Seq(paramsList) =>
+                        Seq(paramsList :+ childrenParam) ++ Seq(implicitParams :+ ctorTagParam)
+                      case Seq() =>
+                        emptyPropsConstructorError
+                      case _ =>
+                        ctorWithoutImplicits ++ Seq(Seq(childrenParam)) ++ Seq(implicitParams :+ ctorTagParam)
+                    }
+                  } else {
+                    ctor ++ Seq(Seq(childrenParam), Seq(ctorTagParam))
+                  }
+                  Seq(
+                    q"""def apply(...$apply): $VNode = {
+                      apply($propsClassNameTerm(...$ctorCall), children: _*)
+                    }"""
+                  )
+              }
             } else Nil)
         }
       }
@@ -180,7 +222,6 @@ class PreactComponent[PropsType, StateType](withChildren: Boolean = false) exten
         PreactComponentImpl.expand(cls, None, params)
 
       case _ =>
-        println(defn.structure)
         abort("@PreactComponent must annotate a Preact component class.")
     }
 

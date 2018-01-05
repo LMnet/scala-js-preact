@@ -278,102 +278,398 @@ class PreactComponentMacroTest extends FreeSpec {
       }
       "when component has companion object" - {
         "and companion contains companion's Props definition" - {
-          "and component doesn't render children" in {
-            val actual = expand(
-              cls = q"""
-                class Test {
-                  def render() = Preact.raw.h("div", null, null)
+          "and component doesn't render children" - {
+            "and Props has one argument list in the constructor" in {
+              val actual = expand(
+                cls = q"""
+                  class Test {
+                    def render() = Preact.raw.h("div", null, null)
+                  }
+                """,
+                  companionOpt = Some(q"""
+                  object Test {
+                    case class Props(a: String, b: Int)
+                  }
+                """),
+                  Params(
+                    propsType = t"Props",
+                    stateType = unitType,
+                    withChildrenValue = false
+                  )
+                )
+
+                val expected = q"""
+                class Test extends _root_.preact.Preact.Component[Props, Unit] {
+                  def render() = Preact.raw.h("div",null, null)
                 }
-              """,
-              companionOpt = Some(q"""
                 object Test {
                   case class Props(a: String, b: Int)
+
+                  def apply(props: Props)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], null
+                    )
+                  }
+                  def apply(a: String, b: Int)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b))
+                  }
                 }
-              """),
-              Params(
-                propsType = t"Props",
-                stateType = unitType,
-                withChildrenValue = false
+              """
+                assertStructurallyEqual(actual, expected)
+              }
+            "and Props has more than one argument list in the constructor" in {
+              val actual = expand(
+                cls = q"""
+                  class Test {
+                    def render() = Preact.raw.h("div", null, null)
+                  }
+                """,
+                companionOpt = Some(q"""
+                  object Test {
+                    case class Props(a: String, b: Int)(c: Long)(d: Option[String])
+                  }
+                """),
+                Params(
+                  propsType = t"Test.Props",
+                  stateType = unitType,
+                  withChildrenValue = false
+                )
               )
-            )
 
-            val expected = q"""
-              class Test extends _root_.preact.Preact.Component[Props, Unit] {
-                def render() = Preact.raw.h("div",null, null)
-              }
-              object Test {
-                case class Props(a: String, b: Int)
+              val expected = q"""
+                class Test extends _root_.preact.Preact.Component[Test.Props, Unit] {
+                  def render() = Preact.raw.h("div",null, null)
+                }
+                object Test {
+                  case class Props(a: String, b: Int)(c: Long)(d: Option[String])
 
-                def apply(props: Props)(
-                  implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
-                ): _root_.preact.Preact.VNode = {
-                  _root_.preact.Preact.raw.h(
-                    ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], null
-                  )
+                  def apply(props: Test.Props)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], null
+                    )
+                  }
+                  def apply(a: String, b: Int)(c: Long)(d: Option[String])(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b)(c)(d))
+                  }
                 }
-                def apply(a: String, b: Int)(
-                  implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
-                ): _root_.preact.Preact.VNode = {
-                  apply(Props(a, b))
+              """
+              assertStructurallyEqual(actual, expected)
+            }
+            "and Props has implicits argument list in the constructor" in {
+              val actual = expand(
+                cls = q"""
+                  class Test {
+                    def render() = Preact.raw.h("div", null, null)
+                  }
+                """,
+                companionOpt = Some(q"""
+                  object Test {
+                    case class Props(a: String, b: Int)(implicit c: Long)
+                  }
+                """),
+                Params(
+                  propsType = t"Test.Props",
+                  stateType = unitType,
+                  withChildrenValue = false
+                )
+              )
+
+              val expected = q"""
+                class Test extends _root_.preact.Preact.Component[Test.Props, Unit] {
+                  def render() = Preact.raw.h("div",null, null)
                 }
-              }
-            """
-            assertStructurallyEqual(actual, expected)
+                object Test {
+                  case class Props(a: String, b: Int)(implicit c: Long)
+
+                  def apply(props: Test.Props)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], null
+                    )
+                  }
+                  def apply(a: String, b: Int)(
+                    implicit c: Long, ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b)(c))
+                  }
+                }
+              """
+              assertStructurallyEqual(actual, expected)
+            }
+            "and Props has more than one argument list in the constructor and the last list is implicit" in {
+              val actual = expand(
+                cls = q"""
+                  class Test {
+                    def render() = Preact.raw.h("div", null, null)
+                  }
+                """,
+                companionOpt = Some(q"""
+                  object Test {
+                    case class Props(a: String, b: Int)(c: Long)(implicit d: Option[String])
+                  }
+                """),
+                Params(
+                  propsType = t"Test.Props",
+                  stateType = unitType,
+                  withChildrenValue = false
+                )
+              )
+
+              val expected = q"""
+                class Test extends _root_.preact.Preact.Component[Test.Props, Unit] {
+                  def render() = Preact.raw.h("div",null, null)
+                }
+                object Test {
+                  case class Props(a: String, b: Int)(c: Long)(implicit d: Option[String])
+
+                  def apply(props: Test.Props)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], null
+                    )
+                  }
+                  def apply(a: String, b: Int)(c: Long)(
+                    implicit d: Option[String], ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b)(c)(d))
+                  }
+                }
+              """
+              assertStructurallyEqual(actual, expected)
+            }
           }
-          "and component render children" in {
-            val actual = expand(
-              cls = q"""
+
+          "and component render children" - {
+            "and Props constructor has one argument list in the constructor" in {
+              val actual = expand(
+                cls = q"""
                 class Test {
                   def render() = Preact.raw.h("div", null, children)
                 }
               """,
-              companionOpt = Some(q"""
+                companionOpt = Some(q"""
                 object Test {
                   case class Props(a: String, b: Int)
                 }
               """),
-              Params(
-                propsType = t"Props",
-                stateType = unitType,
-                withChildrenValue = true
+                Params(
+                  propsType = t"Props",
+                  stateType = unitType,
+                  withChildrenValue = true
+                )
               )
-            )
 
-            val expected = q"""
-              class Test extends _root_.preact.Preact.Component[Props, Unit] {
-                def render() = Preact.raw.h("div",null, children)
-              }
-              object Test {
-                case class Props(a: String, b: Int)
+              val expected = q"""
+                class Test extends _root_.preact.Preact.Component[Props, Unit] {
+                  def render() = Preact.raw.h("div",null, children)
+                }
+                object Test {
+                  case class Props(a: String, b: Int)
 
-                def apply(props: Props)(
-                  implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
-                ): _root_.preact.Preact.VNode = {
-                  _root_.preact.Preact.raw.h(
-                    ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], null
-                  )
+                  def apply(props: Props)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], null
+                    )
+                  }
+                  def apply(props: Props, children: _root_.preact.Preact.Child*)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], children: _*
+                    )
+                  }
+                  def apply(a: String, b: Int)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b))
+                  }
+                  def apply(a: String, b: Int, children: _root_.preact.Preact.Child*)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b), children: _*)
+                  }
                 }
-                def apply(props: Props, children: _root_.preact.Preact.Child*)(
-                  implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
-                ): _root_.preact.Preact.VNode = {
-                  _root_.preact.Preact.raw.h(
-                    ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], children: _*
-                  )
-                }
-                def apply(a: String, b: Int)(
-                  implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
-                ): _root_.preact.Preact.VNode = {
-                  apply(Props(a, b))
-                }
-                def apply(a: String, b: Int, children: _root_.preact.Preact.Child*)(
-                  implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
-                ): _root_.preact.Preact.VNode = {
-                  apply(Props(a, b), children: _*)
-                }
+              """
+                assertStructurallyEqual(actual, expected)
               }
-            """
-            assertStructurallyEqual(actual, expected)
+            "and Props has more than one argument list in the constructor" in {
+              val actual = expand(
+                cls = q"""
+                  class Test {
+                    def render() = Preact.raw.h("div", null, null)
+                  }
+                """,
+                companionOpt = Some(q"""
+                  object Test {
+                    case class Props(a: String, b: Int)(c: Long)(d: Option[String])
+                  }
+                """),
+                Params(
+                  propsType = t"Test.Props",
+                  stateType = unitType,
+                  withChildrenValue = true
+                )
+              )
+
+              val expected = q"""
+                class Test extends _root_.preact.Preact.Component[Test.Props, Unit] {
+                  def render() = Preact.raw.h("div",null, null)
+                }
+                object Test {
+                  case class Props(a: String, b: Int)(c: Long)(d: Option[String])
+
+                  def apply(props: Test.Props)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], null
+                    )
+                  }
+                  def apply(props: Test.Props, children: _root_.preact.Preact.Child*)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], children: _*
+                    )
+                  }
+                  def apply(a: String, b: Int)(c: Long)(d: Option[String])(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b)(c)(d))
+                  }
+                  def apply(a: String, b: Int)(c: Long)(d: Option[String])(children: _root_.preact.Preact.Child*)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b)(c)(d), children: _*)
+                  }
+                }
+              """
+              assertStructurallyEqual(actual, expected)
+            }
+            "and Props has implicits argument list in the constructor" in {
+              val actual = expand(
+                cls = q"""
+                  class Test {
+                    def render() = Preact.raw.h("div", null, null)
+                  }
+                """,
+                companionOpt = Some(q"""
+                  object Test {
+                    case class Props(a: String, b: Int)(implicit c: Long)
+                  }
+                """),
+                Params(
+                  propsType = t"Test.Props",
+                  stateType = unitType,
+                  withChildrenValue = true
+                )
+              )
+
+              val expected = q"""
+                class Test extends _root_.preact.Preact.Component[Test.Props, Unit] {
+                  def render() = Preact.raw.h("div",null, null)
+                }
+                object Test {
+                  case class Props(a: String, b: Int)(implicit c: Long)
+
+                  def apply(props: Test.Props)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], null
+                    )
+                  }
+                  def apply(props: Test.Props, children: _root_.preact.Preact.Child*)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], children: _*
+                    )
+                  }
+                  def apply(a: String, b: Int)(
+                    implicit c: Long, ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b)(c))
+                  }
+                  def apply(a: String, b: Int, children: _root_.preact.Preact.Child*)(
+                    implicit c: Long, ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b)(c), children: _*)
+                  }
+                }
+              """
+              assertStructurallyEqual(actual, expected)
+            }
+            "and Props has more than one argument list in the constructor and the last list is implicit" in {
+              val actual = expand(
+                cls = q"""
+                  class Test {
+                    def render() = Preact.raw.h("div", null, null)
+                  }
+                """,
+                companionOpt = Some(q"""
+                  object Test {
+                    case class Props(a: String, b: Int)(c: Long)(implicit d: Option[String])
+                  }
+                """),
+                Params(
+                  propsType = t"Test.Props",
+                  stateType = unitType,
+                  withChildrenValue = true
+                )
+              )
+
+              val expected = q"""
+                class Test extends _root_.preact.Preact.Component[Test.Props, Unit] {
+                  def render() = Preact.raw.h("div",null, null)
+                }
+                object Test {
+                  case class Props(a: String, b: Int)(c: Long)(implicit d: Option[String])
+
+                  def apply(props: Test.Props)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw.Attributes], null
+                    )
+                  }
+                  def apply(props: Test.Props, children: _root_.preact.Preact.Child*)(
+                    implicit ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    _root_.preact.Preact.raw.h(
+                      ct.constructor, props.asInstanceOf[_root_.preact.Preact.raw
+                      .Attributes], children: _*
+                    )
+                  }
+                  def apply(a: String, b: Int)(c: Long)(
+                    implicit d: Option[String], ct: _root_.scala.scalajs.js.ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b)(c)(d))
+                  }
+                  def apply(a: String, b: Int)(c: Long)(children: _root_.preact.Preact.Child*)(
+                    implicit d: Option[String], ct: _root_.scala.scalajs.js
+                    .ConstructorTag[Test]
+                  ): _root_.preact.Preact.VNode = {
+                    apply(Props(a, b)(c)(d), children: _*)
+                  }
+                }
+              """
+              assertStructurallyEqual(actual, expected)
+            }
           }
+        }
           "and Props is passed to annotation with companion name" in {
             val actual = expand(
               cls = q"""
@@ -416,7 +712,6 @@ class PreactComponentMacroTest extends FreeSpec {
             """
             assertStructurallyEqual(actual, expected)
           }
-        }
       }
       "when component's constructor contains single argument with non-'props' name" in {
         val actual = expand(
