@@ -97,7 +97,7 @@ class TagsDslTest extends FreeSpec {
             val attr = disabled
             val node = a(attr)
             val expected = h("a", js.Dictionary[js.Any](
-              "disabled" -> ""
+              "disabled" -> "true"
             ))
             assert(isEqual(node, expected))
           }

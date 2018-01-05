@@ -12,7 +12,7 @@ case class KeyValueAttribute(name: String, value: js.Any) extends Attribute
 
 trait EmptyAttribute extends Attribute {
   def name: String
-  def value: js.Any = ""
+  def value: js.Any = "true"
 }
 
 class StringAttributeBuilder(val name: String) {
