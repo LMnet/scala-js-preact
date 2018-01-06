@@ -137,6 +137,8 @@ class PropslessComponent {...}
 class ConstantComponent {...}
 ```
 
+*IMPORTANT NOTE!* You should always wrap `Props` and `State` in the class (or case class), even if it has only one parameter. This is necessary because these objects are handled by Preact's javascript code, which could mutate your immutable scala code from js side and cause undefined behavior.
+
 The only one required method in the components is `render`:
 ```scala
 @PreactComponent[Props, State]
