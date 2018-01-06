@@ -125,6 +125,13 @@ private[preact] object PreactComponentImpl {
           case _ => None
         }
       }
+      def ctorParamssToDefParamss(paramss: Seq[Seq[Term.Param]]): Seq[Seq[Term.Param]] = {
+        paramss.map(_.map { param =>
+          param.copy(mods = param.mods.filterNot { mod =>
+            mod.is[Mod.ValParam] || mod.is[Mod.VarParam]
+          })
+        })
+      }
 
       val result: Option[Option[Seq[Defn.Def]]] = for {
         propsClassName <- propsClassNameOpt
@@ -134,11 +141,9 @@ private[preact] object PreactComponentImpl {
         stats.collectFirst {
           // companion contains correct Props class of type `$tpe` in the body
           case q"case class $tpe(...$ctor)" if tpe.structure == propsClassName.structure =>
-            val ctorCall = ctor.map { params =>
-              params.map { param =>
-                Term.Name(param.name.value)
-              }
-            }
+            val ctorCall = ctor.map(_.map { param =>
+              Term.Name(param.name.value)
+            })
             val isCtorHasImplicits = (for {
               last <- ctor.lastOption
               head <- last.headOption
@@ -148,34 +153,33 @@ private[preact] object PreactComponentImpl {
 
             val propsClassNameTerm = Term.Name(tpe.value)
 
-            val commonApply = if (isCtorHasImplicits) {
+            val commonApplyParamss = ctorParamssToDefParamss(if (isCtorHasImplicits) {
               ctor.init ++ Seq(ctor.last :+ ctorTagParam)
             } else {
               ctor ++ Seq(Seq(ctorTagParam))
-            }
-            Seq(
-              q"""def apply(...$commonApply): $VNode = {
+            })
+            val commonApply = Seq(
+              q"""def apply(...$commonApplyParamss): $VNode = {
                 apply($propsClassNameTerm(...$ctorCall))
               }"""
-            ) ++ (if (withChildren) {
+            )
+
+            val childrenApply = if (withChildren) {
               def emptyPropsConstructorError = abort("Props constructor should have at least one argument")
               val childrenParam = param"children: $Child*"
-              ctor match {
-                case Seq(paramsList) =>
-                  Seq(
-                    q"""def apply(..$paramsList, $childrenParam)($ctorTagParam): $VNode = {
-                      apply($propsClassNameTerm(...$ctorCall), children: _*)
-                    }"""
-                  )
+
+              val applyParamss: Seq[Seq[Term.Param]] = ctorParamssToDefParamss(ctor match {
+                case Seq(params) =>
+                  Seq(params :+ childrenParam, Seq(ctorTagParam))
                 case Seq() =>
                   emptyPropsConstructorError
                 case _ =>
-                  val apply = if (isCtorHasImplicits) {
+                  if (isCtorHasImplicits) {
                     val ctorWithoutImplicits = ctor.init
                     val implicitParams = ctor.last
                     ctorWithoutImplicits match {
-                      case Seq(paramsList) =>
-                        Seq(paramsList :+ childrenParam) ++ Seq(implicitParams :+ ctorTagParam)
+                      case Seq(params) =>
+                        Seq(params :+ childrenParam) ++ Seq(implicitParams :+ ctorTagParam)
                       case Seq() =>
                         emptyPropsConstructorError
                       case _ =>
@@ -184,13 +188,16 @@ private[preact] object PreactComponentImpl {
                   } else {
                     ctor ++ Seq(Seq(childrenParam), Seq(ctorTagParam))
                   }
-                  Seq(
-                    q"""def apply(...$apply): $VNode = {
-                      apply($propsClassNameTerm(...$ctorCall), children: _*)
-                    }"""
-                  )
-              }
-            } else Nil)
+              })
+
+              Seq(
+                q"""def apply(...$applyParamss): $VNode = {
+                  apply($propsClassNameTerm(...$ctorCall), children: _*)
+                }"""
+              )
+            } else Nil
+
+            commonApply ++ childrenApply
         }
       }
 
